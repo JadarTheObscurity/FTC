@@ -16,17 +16,16 @@ import java.util.List;
 
 public class TowerPipeline extends OpenCvPipeline {
 
-    Point resolution;
+    Point show_resolution = new Point(640, 480);
+    Point process_resolution = new Point(160, 120);
 
-    public TowerPipeline(Point resolution){
-
-        this.resolution = resolution;
-    }
 
     Mat thresh = new Mat();
     Mat ROI = new Mat();
-    Mat HSV = new Mat();
+    Mat show_HSV = new Mat();
+    Mat proc_HSV = new Mat();
     Mat show = new Mat();
+    Mat origin = new Mat();
     public int min_h = 10;
     public int max_h = 30;
     public int min_s = 30;
@@ -39,8 +38,8 @@ public class TowerPipeline extends OpenCvPipeline {
     public int x;
     public int y;
 
-    Point pointA = new Point(0 * resolution.x / 8, 0 * resolution.y/8);
-    Point pointB = new Point(8 * resolution.x / 8, 4 * resolution.y/8);
+    Point pointA = new Point(0 * show_resolution.x / 8, 0 * show_resolution.y/8);
+    Point pointB = new Point(8 * show_resolution.x / 8, 4 * show_resolution.y/8);
 
     enum Stage{
         Origin,
@@ -60,7 +59,7 @@ public class TowerPipeline extends OpenCvPipeline {
      */
 
     private void toHSV(Mat input){
-        Imgproc.cvtColor(input, HSV, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(input, show_HSV, Imgproc.COLOR_BGR2HSV);
     }
 
     @Override
@@ -79,37 +78,23 @@ public class TowerPipeline extends OpenCvPipeline {
          * it to another Mat.
          */
 
-        /*
-         * Draw a simple box around the middle 1/2 of the entire frame
-         */
-        Imgproc.resize(input, input, new Size(resolution.x, resolution.y));
+        Imgproc.resize(input, input, new Size(show_resolution.x, show_resolution.y));
         show = input.clone();
         Imgproc.blur(input, input, new Size(3, 3));
         toHSV(input);
-        Core.inRange(HSV, new Scalar(min_h, min_s, min_v), new Scalar(max_h, max_s, max_v), thresh);
+        Core.inRange(show_HSV, new Scalar(min_h, min_s, min_v), new Scalar(max_h, max_s, max_v), thresh);
 
         findTower(show);
 
 
         if(curr_stage >= Stage.values().length) curr_stage = 0;
         if(curr_stage == Stage.Origin.ordinal()) {
-//                Imgproc.rectangle(
-//                        show,
-//                        pointA,
-//                        pointB,
-//                        new Scalar(0, 255, 0), 4);
             return show;
         }
         if(curr_stage == Stage.Thresh.ordinal()) {
-//                Imgproc.rectangle(
-//                        thresh,
-//                        pointA,
-//                        pointB,
-//                        new Scalar(255, 255, 255), 4);
             return  thresh;
         }
         if(curr_stage == Stage.ROI.ordinal()) {
-
             return show;
         }
         return thresh;
