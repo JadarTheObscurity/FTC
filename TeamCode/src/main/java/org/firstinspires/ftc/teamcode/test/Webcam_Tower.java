@@ -18,8 +18,8 @@ public class Webcam_Tower extends OpMode {
     MyWebcam webcam;
 
     public static int pipline_stage = 0;
-    public static int min_h = 10;
-    public static int max_h = 30;
+    public static int min_h = 100;
+    public static int max_h = 130;
     public static int min_s = 30;
     public static int max_s = 255;
     public static int min_v = 230;

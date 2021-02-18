@@ -17,34 +17,35 @@ import java.util.List;
 public class TowerPipeline extends OpenCvPipeline {
 
     Point show_resolution = new Point(640, 480);
-    Point process_resolution = new Point(160, 120);
+    Point proc_resolution = new Point(160, 120);
+    double x_ratio = show_resolution.x / proc_resolution.x;
+    double y_ratio = show_resolution.y / proc_resolution.y;
 
 
-    Mat thresh = new Mat();
     Mat ROI = new Mat();
     Mat show_HSV = new Mat();
-    Mat proc_HSV = new Mat();
-    Mat show = new Mat();
-    Mat origin = new Mat();
-    public int min_h = 10;
-    public int max_h = 30;
+    Mat proc_Mat = new Mat();
+    Mat display_Mat = new Mat();
+    Mat show_mat = new Mat();
+    public int min_h = 100;
+    public int max_h = 130;
     public int min_s = 30;
     public int max_s = 255;
     public int min_v = 200;
     public int max_v = 255;
-    int min_area = 2000;
+    int min_area = 500;
 
     public boolean found = false;
     public int x;
     public int y;
 
-    Point pointA = new Point(0 * show_resolution.x / 8, 0 * show_resolution.y/8);
-    Point pointB = new Point(8 * show_resolution.x / 8, 4 * show_resolution.y/8);
+    Point pointA = new Point(0 * proc_resolution.x / 8, 0 * proc_resolution.y/8);
+    Point pointB = new Point(8 * proc_resolution.x / 8, 4 * proc_resolution.y/8);
 
     enum Stage{
         Origin,
-        Thresh,
-        ROI
+        Mask,
+        Debug
     }
     public static int curr_stage = 0;
 
@@ -58,13 +59,9 @@ public class TowerPipeline extends OpenCvPipeline {
      * constantly allocating and freeing large chunks of memory.
      */
 
-    private void toHSV(Mat input){
-        Imgproc.cvtColor(input, show_HSV, Imgproc.COLOR_BGR2HSV);
-    }
-
     @Override
     public void init(Mat input){
-        toHSV(input);
+
     }
 
     @Override
@@ -79,38 +76,55 @@ public class TowerPipeline extends OpenCvPipeline {
          */
 
         Imgproc.resize(input, input, new Size(show_resolution.x, show_resolution.y));
-        show = input.clone();
-        Imgproc.blur(input, input, new Size(3, 3));
-        toHSV(input);
-        Core.inRange(show_HSV, new Scalar(min_h, min_s, min_v), new Scalar(max_h, max_s, max_v), thresh);
-
-        findTower(show);
+        input.copyTo(show_mat);
+        createMask(input, show_HSV);
+        findTower(input);
 
 
         if(curr_stage >= Stage.values().length) curr_stage = 0;
         if(curr_stage == Stage.Origin.ordinal()) {
-            return show;
+            show_mat.copyTo(display_Mat);
         }
-        if(curr_stage == Stage.Thresh.ordinal()) {
-            return  thresh;
+        if(curr_stage == Stage.Mask.ordinal()) {
+
+            show_HSV.copyTo(display_Mat);
         }
-        if(curr_stage == Stage.ROI.ordinal()) {
-            return show;
+        if(curr_stage == Stage.Debug.ordinal()) {
+            show_mat.copyTo(display_Mat);
         }
-        return thresh;
+        if(display_Mat == null) input.copyTo(display_Mat);
+
+
+
+
+        //release mat
+//        input.release();
+//        show_mat.release();
+//        show_HSV.release();
+//        proc_Mat.release();
+//        ROI.release();
+
+        return display_Mat;
     }
 
     List<MatOfPoint> contours = new ArrayList<>();
     Mat hierarchy = new Mat();
     MatOfPoint2f[] contoursPoly  = new MatOfPoint2f[contours.size()];
-    void findTower(Mat show){
-        ROI = new Mat(thresh, new Rect(pointA, pointB));
+    void findTower(Mat input){
+        //resize
+        Imgproc.resize(input, proc_Mat, new Size(proc_resolution.x, proc_resolution.y));
+        //blur
+        Imgproc.blur(proc_Mat, proc_Mat, new Size(3,3));
+        //create mask
+        createMask(proc_Mat, proc_Mat);
+        //roi
+        ROI = new Mat(proc_Mat, new Rect(pointA, pointB));
         //find contour
         contours = new ArrayList<>();
         hierarchy = new Mat();
         Imgproc.findContours(ROI, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        //draw contour
+        //find contour rectangle
         contoursPoly = new MatOfPoint2f[contours.size()];
         Rect[] boundRect = new Rect[contours.size()];
         Point[] centers = new Point[contours.size()];
@@ -127,6 +141,17 @@ public class TowerPipeline extends OpenCvPipeline {
             contoursPolyList.add(new MatOfPoint(poly.toArray()));
         }
 
+        //resize all rectangle
+//        for(int i = 0; i < contours.size(); i++) {
+//            boundRect[i].tl().x *= x_ratio;
+//            boundRect[i].tl().y *= y_ratio;
+//
+//
+//
+//            boundRect[i].br().x *= x_ratio;
+//            boundRect[i].br().y *= y_ratio;
+//        }
+        //draw rectangle
         double max_area = 0;
         int index = 0;
         boolean tem_found = false;
@@ -137,16 +162,18 @@ public class TowerPipeline extends OpenCvPipeline {
                     tem_found = true;
                     index = i;
                 }
-                Imgproc.rectangle(show, boundRect[i].tl(), boundRect[i].br(), new Scalar(173, 56, 237), 2);
+                Imgproc.rectangle(show_mat,new Point(boundRect[i].tl().x * x_ratio, boundRect[i].tl().y * y_ratio),
+                        new Point(boundRect[i].br().x * x_ratio, boundRect[i].br().y * y_ratio), new Scalar(173, 56, 237), 2);
             }
         }
         found = tem_found;
 
         if(found){
-            x = (int)(boundRect[index].tl().x + boundRect[index].br().x)/2;
-            y = (int)(boundRect[index].tl().y + boundRect[index].br().y)/2;
-            Imgproc.line(show, new Point(x, 0), new Point(x, show.size().height),  new Scalar(0, 255, 255), 2);
-            Imgproc.rectangle(show, boundRect[index].tl(), boundRect[index].br(), new Scalar(0, 255, 0), 3);
+            x = (int)((boundRect[index].tl().x + boundRect[index].br().x)/2 * x_ratio);
+            y = (int)((boundRect[index].tl().y + boundRect[index].br().y)/2 * y_ratio);
+            Imgproc.line(show_mat, new Point(x, 0), new Point(x, show_mat.size().height),  new Scalar(0, 255, 255), 2);
+            Imgproc.rectangle(show_mat,new Point(boundRect[index].tl().x * x_ratio, boundRect[index].tl().y * y_ratio),
+                    new Point(boundRect[index].br().x * x_ratio, boundRect[index].br().y * y_ratio), new Scalar(0, 255, 0), 3);
         }
 
 
@@ -166,5 +193,10 @@ public class TowerPipeline extends OpenCvPipeline {
         this.max_s = max_s;
         this.min_v = min_v;
         this.max_v = max_v;
+    }
+
+    void createMask(Mat src, Mat dst){
+        Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
+        Core.inRange(dst,new Scalar(min_h, min_s, min_v), new Scalar(max_h, max_s, max_v), dst);
     }
 }
