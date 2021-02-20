@@ -33,6 +33,27 @@ public class TowerPipeline extends OpenCvPipeline {
     public int max_s = 255;
     public int min_v = 200;
     public int max_v = 255;
+
+    public TowerPipeline(Tower tower){
+        switch (tower){
+            case Blue:
+                curr_hsv = blue_hsv;
+                break;
+            case Red:
+                curr_hsv = red_hsv;
+        }
+    }
+
+    public enum Tower{
+        Blue,
+        Red
+    }
+
+    final HSV_threshold blue_hsv = new HSV_threshold(100, 130, 30, 255, 200, 255);
+    final HSV_threshold red_hsv = new HSV_threshold(0, 255, 0, 255, 0, 255);
+
+    HSV_threshold curr_hsv;
+
     int min_area = 500;
 
     public boolean found = false;
@@ -141,16 +162,7 @@ public class TowerPipeline extends OpenCvPipeline {
             contoursPolyList.add(new MatOfPoint(poly.toArray()));
         }
 
-        //resize all rectangle
-//        for(int i = 0; i < contours.size(); i++) {
-//            boundRect[i].tl().x *= x_ratio;
-//            boundRect[i].tl().y *= y_ratio;
-//
-//
-//
-//            boundRect[i].br().x *= x_ratio;
-//            boundRect[i].br().y *= y_ratio;
-//        }
+
         //draw rectangle
         double max_area = 0;
         int index = 0;
@@ -180,23 +192,44 @@ public class TowerPipeline extends OpenCvPipeline {
     }
 
 
-    public void setHSVThreshold(int min_y,
-                                int max_y,
+    public void setHSVThreshold(int min_h,
+                                int max_h,
                                 int min_s,
                                 int max_s,
                                 int min_v,
                                 int max_v){
 
-        this.min_h = min_y;
-        this.max_h = max_y;
+       curr_hsv = new HSV_threshold(min_h, max_h, min_s, max_s, min_v, max_v);
+    }
+
+    void createMask(Mat src, Mat dst){
+        Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
+        Core.inRange(dst,curr_hsv.min(), curr_hsv.max(), dst);
+    }
+}
+
+class HSV_threshold{
+    public int min_h;
+    public int max_h;
+    public int min_s;
+    public int max_s;
+    public int min_v;
+    public int max_v;
+
+    public HSV_threshold(int min_h,int max_h,int min_s,int max_s,int min_v,int max_v){
+        this.min_h = min_h;
+        this.max_h = max_h;
         this.min_s = min_s;
         this.max_s = max_s;
         this.min_v = min_v;
         this.max_v = max_v;
     }
 
-    void createMask(Mat src, Mat dst){
-        Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
-        Core.inRange(dst,new Scalar(min_h, min_s, min_v), new Scalar(max_h, max_s, max_v), dst);
+    public Scalar min(){
+        return new Scalar(min_h, min_s, min_v);
+    }
+
+    public Scalar max(){
+        return new Scalar(max_h, max_s, max_v);
     }
 }

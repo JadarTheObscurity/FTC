@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @TeleOp(name = "Webcam Tower", group = "Test")
 public class Webcam_Tower extends OpMode {
     FtcDashboard dashboard;
-    TowerPipeline pipeline = new TowerPipeline();
+    TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Blue);
     MyWebcam webcam;
 
     public static int pipline_stage = 0;
