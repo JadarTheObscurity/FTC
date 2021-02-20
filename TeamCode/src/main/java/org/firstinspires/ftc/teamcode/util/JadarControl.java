@@ -29,6 +29,9 @@ public class JadarControl {
     public double x_target = 0;
     public double y_target = 0;
     public double r_target = 0;
+    public double vx_target = 0;
+    public double vy_target = 0;
+
 
     public boolean moveTo(double x, double y, double r){
         double s = Math.hypot(x, y);
@@ -43,6 +46,9 @@ public class JadarControl {
         y_target = s_of_t(y, timer.seconds(), total_time);
         r_target = s_of_t(r-driveTrain.last_imu, timer.seconds(), total_time);
 
+        vx_target = v_of_t(x, timer.seconds(), total_time);
+        vy_target = v_of_t(y, timer.seconds(), total_time);
+
         double x_error = x_target - driveTrain.get_x();
         double y_error = y_target - driveTrain.get_y();
         double r_error = clipAngleDegree(r_target, driveTrain.get_heading()-driveTrain.last_imu);
@@ -50,9 +56,13 @@ public class JadarControl {
         //P control
 
         double power_limit = 1;
-        double x_power = Range.clip(x_error * x_kp, -power_limit, power_limit);
-        double y_power = Range.clip(y_error * y_kp, -power_limit, power_limit);
+        double x_power = vx_target / driveTrain.x_pv_ratio + Range.clip(x_error * x_kp, -power_limit, power_limit);
+        double y_power = vy_target / driveTrain.y_pv_ratio + Range.clip(y_error * y_kp, -power_limit, power_limit);
+//        double x_power = Range.clip(x_error * x_kp, -power_limit, power_limit);
+//        double y_power = Range.clip(y_error * y_kp, -power_limit, power_limit);
         double r_power = Range.clip(r_error * r_kp, -power_limit, power_limit);
+
+
 
 
         // add extra 0.1 second to yeah you know what I mean
@@ -72,7 +82,7 @@ public class JadarControl {
 
     double v_of_t(double s, double t, double total_time){
         if(t <= total_time){
-            return s * total_time / 2 / Math.PI * Math.sin(t / total_time * Math.PI);
+            return s / total_time / 2 * Math.PI * Math.sin(t / total_time * Math.PI);
         }
         return 0;
     }

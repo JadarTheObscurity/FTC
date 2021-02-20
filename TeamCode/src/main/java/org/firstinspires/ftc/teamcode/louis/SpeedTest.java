@@ -22,19 +22,16 @@ public class SpeedTest extends OpMode {
     }
 
     double start_x  =0;
-    double end_x = 50;
+    double end_x = 0;
     double start_y = 0;
     double end_y= 0;
-    double power = 0.8;
+    double power = 0.5;
 //113 167
     int stage = 0;
     public static double speed = 30;
     @Override
     public void loop() {
-        if(timer.seconds() < Math.abs(120/speed)){
-            louis.move(speed/112, 0, 0);
-        }
-        else louis.move(0, 0, 0);
+        test();
     }
 
     void test(){
