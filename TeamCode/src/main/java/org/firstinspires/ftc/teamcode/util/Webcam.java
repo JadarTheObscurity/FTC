@@ -21,11 +21,11 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyWebcam {
+public class Webcam {
     OpenCvCamera webcam;
     boolean isStreaming = false;
     public Point resolution;
-    public MyWebcam(HardwareMap hardwareMap, Point resolution){
+    public Webcam(HardwareMap hardwareMap, Point resolution){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         this.resolution = resolution;

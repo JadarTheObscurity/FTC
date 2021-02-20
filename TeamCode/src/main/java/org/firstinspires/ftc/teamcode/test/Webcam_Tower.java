@@ -5,17 +5,16 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.MyWebcam;
+import org.firstinspires.ftc.teamcode.util.Webcam;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
 import org.opencv.core.Point;
-import org.openftc.easyopencv.OpenCvPipeline;
 
 @Config
 @TeleOp(name = "Webcam Tower", group = "Test")
 public class Webcam_Tower extends OpMode {
     FtcDashboard dashboard;
     TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Blue);
-    MyWebcam webcam;
+    Webcam webcam;
 
     public static int pipline_stage = 0;
     public static int min_h = 100;
@@ -28,7 +27,7 @@ public class Webcam_Tower extends OpMode {
     @Override
     public void init() {
         dashboard = FtcDashboard.getInstance();
-        webcam = new MyWebcam(hardwareMap, new Point(640, 480));
+        webcam = new Webcam(hardwareMap, new Point(640, 480));
         webcam.setPipeline(pipeline);
         webcam.startStreaming(dashboard);
     }

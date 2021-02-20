@@ -1,22 +1,27 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.ArrayList;
 
+@Config
 public class MecanumDriveTrain {
     DcMotorEx lf, lb, rf, rb;
     IMU imu;
-    double[] last_pos = {0, 0, 0, 0};
+    public double[] last_pos = {0, 0, 0, 0};
     public double last_imu;
-    ArrayList<DcMotorEx> motors;
+    public ArrayList<DcMotorEx> motors = new ArrayList<>();
 
-    public  final double
+    public double x_pv_ratio = 110;
+    public final double y_pv_ratio = 160;
+
+    public static double
             max_v = 50,
-            max_a = 25,
-            max_w = 30,
+            max_a = 15,
+            max_w = 20,
             max_alpha=20;
 
     public MecanumDriveTrain(HardwareMap hardwareMap, boolean use_encoder){
@@ -37,6 +42,7 @@ public class MecanumDriveTrain {
             for (DcMotorEx m : motors)
                 m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+        for(DcMotorEx m : motors) m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         imu = new IMU(hardwareMap);
         imu.init();
@@ -55,19 +61,20 @@ public class MecanumDriveTrain {
     double wheel_diameter =10.16;
 
 
+    double x_ratio = 120.0/145;
     public double get_x(){
-        double raw_x =  motors.get(0).getCurrentPosition() - last_pos[0] -
-                        motors.get(1).getCurrentPosition() - last_pos[1] +
-                        motors.get(2).getCurrentPosition() - last_pos[2] -
-                        motors.get(3).getCurrentPosition() - last_pos[3];
-        return raw_x / 4 * 2 * Math.PI / motor_tpr * wheel_diameter / 2;
+        double raw_x =  (motors.get(0).getCurrentPosition() - last_pos[0]) -
+                        (motors.get(1).getCurrentPosition() - last_pos[1]) +
+                        (motors.get(2).getCurrentPosition() - last_pos[2]) -
+                        (motors.get(3).getCurrentPosition() - last_pos[3]);
+        return raw_x / 4 * 2 * Math.PI / motor_tpr * wheel_diameter / 2 * x_ratio;
     }
 
     public double get_y(){
-        double raw_y =  motors.get(0).getCurrentPosition() - last_pos[0] +
-                        motors.get(1).getCurrentPosition() - last_pos[1] -
-                        motors.get(2).getCurrentPosition() - last_pos[2] -
-                        motors.get(3).getCurrentPosition() - last_pos[3];
+        double raw_y =  (motors.get(0).getCurrentPosition() - last_pos[0]) +
+                        (motors.get(1).getCurrentPosition() - last_pos[1]) -
+                        (motors.get(2).getCurrentPosition() - last_pos[2]) -
+                        (motors.get(3).getCurrentPosition() - last_pos[3]);
         return raw_y / 4 * 2 * Math.PI / motor_tpr * wheel_diameter / 2;
     }
 
