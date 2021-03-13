@@ -46,8 +46,10 @@ public class IMU {
 //        telemetry.addData("heading", angles.firstAngle);
 //    }
 
-    public double getHeading(){
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+
+    public double getHeading(AngleUnit unit){
+        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, unit);
         return angles.firstAngle;
     }
 }

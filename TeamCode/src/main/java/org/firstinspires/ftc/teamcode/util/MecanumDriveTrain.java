@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import java.util.ArrayList;
 
 @Config
@@ -15,14 +17,22 @@ public class MecanumDriveTrain {
     public double last_imu;
     public ArrayList<DcMotorEx> motors = new ArrayList<>();
 
-    public double x_pv_ratio = 110;
-    public final double y_pv_ratio = 160;
+
+    public double x_pv_ratio = 150;
+    public final double y_pv_ratio = 250;
 
     public static double
-            max_v = 50,
+            max_v = 30,
             max_a = 15,
-            max_w = 20,
-            max_alpha=20;
+            max_w = 50,
+            max_alpha = 20;
+
+    /*
+    v 30
+    a 15
+    w 50
+    alpha 20
+     */
 
     public MecanumDriveTrain(HardwareMap hardwareMap, boolean use_encoder){
         lf = hardwareMap.get(DcMotorEx.class, "lf"); //0
@@ -42,7 +52,7 @@ public class MecanumDriveTrain {
             for (DcMotorEx m : motors)
                 m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        for(DcMotorEx m : motors) m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        for(DcMotorEx m : motors) m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         imu = new IMU(hardwareMap);
         imu.init();
@@ -78,8 +88,16 @@ public class MecanumDriveTrain {
         return raw_y / 4 * 2 * Math.PI / motor_tpr * wheel_diameter / 2;
     }
 
-    public double get_heading(){
-        return imu.getHeading();
+    public double get_r(){
+        double raw_r =  (motors.get(0).getCurrentPosition() - last_pos[0]) +
+                        (motors.get(1).getCurrentPosition() - last_pos[1]) +
+                        (motors.get(2).getCurrentPosition() - last_pos[2]) +
+                        (motors.get(3).getCurrentPosition() - last_pos[3]);
+        return raw_r * -180 / 6750;
+    }
+
+    public double get_heading(AngleUnit unit){
+        return imu.getHeading(unit);
     }
 
     public void reset_pos(){
@@ -88,7 +106,7 @@ public class MecanumDriveTrain {
             last_pos[i] = motors.get(i).getCurrentPosition();
         }
         //reset imu
-        last_imu = get_heading();
+        last_imu = get_heading(AngleUnit.DEGREES);
     }
 
 }
