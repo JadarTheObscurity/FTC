@@ -22,9 +22,9 @@ public class MecanumDriveTrain {
     public final double y_pv_ratio = 250;
 
     public static double
-            max_v = 30,
-            max_a = 15,
-            max_w = 50,
+            max_v = 40,
+            max_a = 20,
+            max_w = 40,
             max_alpha = 20;
 
     /*
@@ -52,12 +52,16 @@ public class MecanumDriveTrain {
             for (DcMotorEx m : motors)
                 m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        for(DcMotorEx m : motors) m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        setMode(DcMotor.ZeroPowerBehavior.BRAKE);
 
         imu = new IMU(hardwareMap);
         imu.init();
 
         reset_pos();
+    }
+
+    void setMode(DcMotor.ZeroPowerBehavior mode){
+        for(DcMotorEx m : motors) m.setZeroPowerBehavior(mode);
     }
 
     public void move(double x, double y, double r){

@@ -49,4 +49,9 @@ public class Pose2d {
     public Vector2d headingVec(){
         return new Vector2d(Math.sin(r), Math.cos(r));
     }
+
+    @Override
+    public String toString(){
+        return "x: " + (int)x + "\ty: "+(int)y+"\tr: "+(int)Math.toDegrees(r);
+    }
 }

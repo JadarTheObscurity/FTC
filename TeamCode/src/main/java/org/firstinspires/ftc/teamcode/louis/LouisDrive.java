@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.louis;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,10 +12,10 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.internal.network.RecvLoopRunnable;
 
 @TeleOp(name="Louis Drive", group = "Louis")
-public class Drive extends OpMode {
+@Config
+public class LouisDrive extends OpMode {
     Louis louis;
     FtcDashboard dashboard;
     TelemetryPacket packet = new TelemetryPacket();
@@ -38,11 +39,13 @@ public class Drive extends OpMode {
     suck = false,
     last_suck = false,
     fire = false;
-
+    public static double bias = 50;
     boolean fire_cooldwon_complete = false;
     @Override
     public void loop() {
-        louis.move(gamepad1.left_stick_x*0.3, -gamepad1.left_stick_y*0.4, gamepad1.right_stick_x*0.5);
+        if(load && louis.see_tower())
+            louis.move(gamepad1.left_stick_x*0.8, -gamepad1.left_stick_y*0.6, Range.clip((louis.tower_x()+bias)*0.002, -0.5, 0.5));
+        else louis.move(gamepad1.left_stick_x*0.8, -gamepad1.left_stick_y*0.6, gamepad1.right_stick_x*0.5);
         if(gamepad1.a) louis.reset_pos();
         for(int i = 0; i < 4; i++) {
             packet.put("curr" + i + " ", louis.driveTrain.motors.get(i).getCurrentPosition());
@@ -107,6 +110,7 @@ public class Drive extends OpMode {
 
         telemetry.addData("arm curent", arm.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("r", louis.driveTrain.get_r());
+        telemetry.addData("shoot speed", louis.shoot.getVelocity());
         packet.put("x", louis.driveTrain.get_x());
         packet.put("y", louis.driveTrain.get_y());
         packet.put("imu", louis.driveTrain.get_heading(AngleUnit.DEGREES));

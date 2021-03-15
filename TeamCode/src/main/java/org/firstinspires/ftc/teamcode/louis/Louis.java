@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.louis;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -7,11 +8,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.JadarControl;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveTrain;
 import org.firstinspires.ftc.teamcode.util.Pose;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
-import org.firstinspires.ftc.teamcode.util.Webcam;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +23,17 @@ import java.util.List;
 public class Louis {
     public MecanumDriveTrain driveTrain;
     JadarControl control;
-    Webcam webcam;
+    OpenCvCamera webcam;
     TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Blue);
     List<LynxModule> allHubs;
     DcMotorEx f_suck, b_suck, shoot, arm;
     Servo claw_servo, push_servo;
     ElapsedTime shoot_timer = new ElapsedTime();
+    FtcDashboard dashboard;
 
 
     public Louis(HardwareMap hardwareMap){
-        driveTrain = new MecanumDriveTrain(hardwareMap, true);
+        driveTrain = new MecanumDriveTrain(hardwareMap, false);
         control = new JadarControl(driveTrain);
         allHubs = hardwareMap.getAll(LynxModule.class);
         arm = hardwareMap.get(DcMotorEx.class, "arm");
@@ -45,7 +50,21 @@ public class Louis {
         arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         for(LynxModule module : allHubs) module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-//        webcam = new Webcam(hardwareMap, new Point(640, 480));
+
+
+        dashboard = FtcDashboard.getInstance();
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam.setPipeline(pipeline);
+        dashboard.startCameraStream(webcam, 10);
+
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+            }
+        });
     }
 
     //State machine
@@ -100,12 +119,12 @@ public class Louis {
 
 
     public void suck_spin(){
-        f_suck.setPower(-1);
+        f_suck.setPower(-0.4);
         b_suck.setPower(-0.7);
     }
 
     public void suck_reverse(){
-        f_suck.setPower(1);
+        f_suck.setPower(0.3);
         b_suck.setPower(0.75);
     }
 
@@ -147,7 +166,7 @@ public class Louis {
 
     //shooter
 
-    public void shooter_shoot(){shoot.setVelocity(-2200);}
+    public void shooter_shoot(){shoot.setVelocity(-2300);}
     public void shooter_stop(){shoot.setPower(0);}
 
     public void fire_on(){push_servo.setPosition(0.8);}
@@ -165,6 +184,14 @@ public class Louis {
             shoot_num++;
         }
         return shoot_num >= 3;
+    }
+
+    public boolean see_tower(){
+        return pipeline.found;
+    }
+
+    public double tower_x(){
+        return pipeline.x - 240;
     }
 
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.louis;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,7 +14,8 @@ import org.firstinspires.ftc.teamcode.util.Pose;
 import java.util.ArrayList;
 
 @Autonomous(name = "Louis Auto 1", group = "Louis")
-public class Auto1 extends OpMode {
+@Disabled
+public class LouisAuto1 extends OpMode {
     Louis louis;
     FtcDashboard dashboard;
     TelemetryPacket packet = new TelemetryPacket();

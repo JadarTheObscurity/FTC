@@ -60,7 +60,7 @@ public class OdometryWheelTest extends OpMode {
         double r = gamepad1.right_stick_x;
         double x = raw_x;//raw_x * Math.cos(heading) + raw_y * Math.sin(heading);
         double y = -raw_y;//-raw_x * Math.sin(heading) + raw_y * Math.cos(heading);
-        double ratio = 0.3;
+        double ratio = 0.7;
         move(ratio * x, ratio * y, r * ratio);
         computeCoordinate();
     }
@@ -76,7 +76,7 @@ public class OdometryWheelTest extends OpMode {
     public static double encoder_cpr = 1460;
     public static double cpr_to_rad = 2 * pi / encoder_cpr;
     public static double distance_ratio = 0.0128;//dead_wheel_diameter/ 2 * cpr_to_rad;
-    public static double spin_ratio = dead_wheel_diameter / lateral_distance * cpr_to_rad * 1.01;
+    public static double spin_ratio = dead_wheel_diameter / lateral_distance * cpr_to_rad * 1.02;
     public static double x_correction_ratio = dead_wheel_diameter / 2 / forward_offset * cpr_to_rad;
 
     void computeCoordinate(){

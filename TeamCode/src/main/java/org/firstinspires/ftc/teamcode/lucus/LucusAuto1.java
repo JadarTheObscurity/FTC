@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.lucus;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.canvas.Canvas;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.util.JadarControl;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 
 import java.util.ArrayList;
@@ -16,9 +15,11 @@ import java.util.ArrayList;
 public class LucusAuto1 extends OpMode {
     Lucus lucus;
     FtcDashboard dashboard;
-    TelemetryPacket packet = new TelemetryPacket();
     DcMotorEx arm;
     Servo claw;
+    Canvas fieldOverlay;
+    public static double cmTOInch = 0.393701;
+
 
     @Override
     public void init() {
@@ -31,6 +32,7 @@ public class LucusAuto1 extends OpMode {
         setup_trajectory();
 
         lucus.claw_grab();
+
     }
 
 
@@ -94,17 +96,17 @@ public class LucusAuto1 extends OpMode {
     public void loop() {
         telemetry.addData("Curr Stage", lucus.stage);
         telemetry.update();
-        packet.put("x", lucus.driveTrain.get_x());
-        packet.put("y", lucus.driveTrain.get_y());
-        packet.put("target x", lucus.control.x_target);
-        packet.put("target y", lucus.control.y_target);
-        packet.put("error y", lucus.control.y_error);
-        packet.put("error y * kp", lucus.control.y_error * JadarControl.y_kp);
-        dashboard.sendTelemetryPacket(packet);
+
 
         C_state_machine();
         lucus.update();
     }
+
+    @Override
+    public void stop() {
+        lucus.finish();
+    }
+
     void C_state_machine(){
 
         if (lucus.stage == C_Stage.Start.ordinal()) {
@@ -128,6 +130,12 @@ public class LucusAuto1 extends OpMode {
         }
         else if (lucus.stage == C_Stage.move_to_shoot_2.ordinal()) {
             if (lucus.moveTo(C_move_to_shoot_2)) lucus.nextStage();
+            if(lucus.pose_index <= 1);
+            else if(lucus.pose_index == 2){
+                lucus.control.time_mult = 3;
+
+            }
+            else lucus.control.time_mult = 1.3;
             lucus.suck_spin();
         }
         else if (lucus.stage == C_Stage.shoot_2.ordinal()) {
@@ -166,31 +174,28 @@ public class LucusAuto1 extends OpMode {
 
     void setup_trajectory(){
 
+        lucus.setStartPose(new Pose2d(-150, -150, Math.toRadians(180)));
+
         /**
          * C
          */
 
-        C_move_to_shoot.add(new Pose2d(0, -50, 0));
-        C_move_to_shoot.add(new Pose2d(0, 0, 0));
-//        C_move_to_shoot.add(new Pose2d(30, 0, 0));
-//        C_move_to_shoot.add(new Pose2d(0, 0, 0));
-//        C_move_to_shoot.add(new Pose(0, -160, 0));
-//        C_move_to_shoot.add(new Pose(0, 0, -20));
-//
-//        C_put_first_wobble.add(new Pose(0, 0, 20));
-//        C_put_first_wobble.add(new Pose(0, -130, 0));
-//        C_put_first_wobble.add(new Pose(0, 0, 45));
-//
-//        C_move_to_shoot_2.add(new Pose(0, 70 ,0));
-//        C_move_to_shoot_2.add(new Pose(0, 0 ,-45));
-//        C_move_to_shoot_2.add(new Pose(0, 150 ,0));
-//
-//        C_grab_second_wobble.add(new Pose(0, 0, 180));
-//        C_grab_second_wobble.add(new Pose(40, -35, 0));
-//
-//        C_put_second_wobble.add(new Pose(-80, 200, 0));
-//        C_put_second_wobble.add(new Pose(0, 0, -135));
-//
-//        C_go_line.add(new Pose(0, 60, 0));
+        C_move_to_shoot.add(new Pose2d(-130, -10, Math.toRadians(157)));
+
+        C_put_first_wobble.add(new Pose2d(-120, 120, Math.toRadians(230)));
+
+
+        C_move_to_shoot_2.add(new Pose2d(-96, 0 ,Math.toRadians(180)));
+        C_move_to_shoot_2.add(new Pose2d(-96, -20 ,Math.toRadians(180)));
+        C_move_to_shoot_2.add(new Pose2d(-93, -72 ,Math.toRadians(180)));
+        C_move_to_shoot_2.add(new Pose2d(-93, -20 ,Math.toRadians(170)));
+
+        C_grab_second_wobble.add(new Pose2d(-50, -20, Math.toRadians(0)));
+        C_grab_second_wobble.add(new Pose2d(-53, -94, Math.toRadians(0)));
+
+        C_put_second_wobble.add(new Pose2d(-50, 0, Math.toRadians(-140)));
+        C_put_second_wobble.add(new Pose2d(-130, 100, Math.toRadians(-140)));
+
+        C_go_line.add(new Pose2d(-130, -140, Math.toRadians(-180)));
     }
 }

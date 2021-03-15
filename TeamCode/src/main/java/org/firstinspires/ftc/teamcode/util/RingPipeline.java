@@ -11,17 +11,18 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class RingPipeline extends OpenCvPipeline {
 
-    Point resolution;
+    Point resolution = new Point(640, 480);
 
 
     public RingPipeline(Point resolution){
         this.resolution = resolution;
     }
-
+    public RingPipeline(){}
 
     Mat thresh = new Mat();
     Mat thresh_region = new Mat();
     Mat ROI = new Mat();
+    HSV_threshold threshold = new HSV_threshold(0, 255, 0, 255, 0, 255);
     public int min_y = 0;
     public int max_y = 255;
     public int min_cr = 0;

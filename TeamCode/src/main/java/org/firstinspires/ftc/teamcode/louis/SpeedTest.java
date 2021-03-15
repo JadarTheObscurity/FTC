@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.louis;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "Louis Speed Test", group = "Louis")
 @Config
+@Disabled
 public class SpeedTest extends OpMode {
     Louis louis;
     ElapsedTime timer = new ElapsedTime();

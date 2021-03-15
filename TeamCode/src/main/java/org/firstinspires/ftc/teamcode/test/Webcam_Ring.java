@@ -6,16 +6,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.Webcam;
+import org.firstinspires.ftc.teamcode.util.RingPipeline;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
+import org.firstinspires.ftc.teamcode.util.Webcam;
 import org.opencv.core.Point;
 
 @Config
 @TeleOp(name = "Webcam Tower Tuner", group = "Test")
 @Disabled
-public class Webcam_Tower extends OpMode {
+public class Webcam_Ring extends OpMode {
     FtcDashboard dashboard;
-    TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Blue);
+    RingPipeline pipeline = new RingPipeline();
     Webcam webcam;
 
     public static int pipline_stage = 0;
@@ -37,6 +38,6 @@ public class Webcam_Tower extends OpMode {
     @Override
     public void loop() {
         TowerPipeline.curr_stage =pipline_stage;
-        pipeline.setHSVThreshold(min_h, max_h, min_s, max_s, min_v, max_v);
+        pipeline.setYCrCbThreshold(min_h, max_h, min_s, max_s, min_v, max_v);
     }
 }
