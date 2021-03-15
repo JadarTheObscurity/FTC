@@ -160,10 +160,10 @@ public class JadarControl {
         vx_target = v_of_t(rel.getX(), timer.seconds(), total_time);
         vy_target = v_of_t(rel.getY(), timer.seconds(), total_time);
 
-        Pose2d to_target = Pose2d.det_pose(start, curr);
-        x_error = x_target - to_target.getX();
-        y_error = y_target - to_target.getY();
-        r_error = r_target - to_target.getR(AngleUnit.DEGREES);
+        Pose2d from_start = Pose2d.det_pose(start, curr);
+        x_error = x_target - from_start.getX();
+        y_error = y_target - from_start.getY();
+        r_error = r_target - from_start.getR(AngleUnit.DEGREES);
 
         double power_limit_y = 1;
         double power_limit_x = 1;
@@ -191,7 +191,7 @@ public class JadarControl {
 
 
         // add extra 0.1 second to yeah you know what I mean
-        if(timer.seconds() > total_time +0.2){
+        if(timer.seconds() > total_time + 0.2 && Pose2d.det_pose(curr, end).getlength() <= 5){
             driveTrain.move(0, 0, 0);
             return true;
         }
@@ -217,6 +217,18 @@ public class JadarControl {
         while(diff > 180) diff -= 360;
         while(diff < -180) diff += 360;
         return diff;
+    }
+
+
+    //TODO Replace it into ow
+    double getTotalTime(Pose2d start, Pose2d end){
+        Pose2d rel = Pose2d.det_pose(start, end);
+        double s = Math.hypot(rel.getX(), rel.getY());
+        //Calculate how long does it takes to reach to the target position
+        double slide_time = max(s/2/ MecanumDriveTrain.max_v, sqrt(s/2/ MecanumDriveTrain.max_a));
+        double turn_time = max(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_w, sqrt(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_alpha));
+        double total_time = max(slide_time, turn_time);
+        return total_time;
     }
 
     boolean sameSign(double a, double b){

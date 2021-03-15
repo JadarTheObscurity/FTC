@@ -50,6 +50,10 @@ public class Pose2d {
         return new Vector2d(Math.sin(r), Math.cos(r));
     }
 
+    public double getlength(){
+        return Math.hypot(x, y);
+    }
+
     @Override
     public String toString(){
         return "x: " + (int)x + "\ty: "+(int)y+"\tr: "+(int)Math.toDegrees(r);

@@ -46,6 +46,7 @@ public class LucusAuto1 extends OpMode {
         grab,
         put_second_wobble,
         release_2,
+        go_line,
         End
     }
     enum B_Stage {
@@ -54,10 +55,13 @@ public class LucusAuto1 extends OpMode {
         shoot,
         put_fist_wobble,
         release_1,
+        move_to_shoot_2,
+        shoot_2,
         grab_second_wobble,
         grab,
         put_second_wobble,
         release_2,
+        go_line,
         End
     }
     enum C_Stage {
@@ -75,18 +79,23 @@ public class LucusAuto1 extends OpMode {
         go_line,
         End
     }
-//
-//    ArrayList<Pose> put_first_wobble = new ArrayList<>();
-//    ArrayList<Pose> release_1 = new ArrayList<>();
-//    ArrayList<Pose> move_to_shoot = new ArrayList<>();
-//    ArrayList<Pose> grab_second_wobble = new ArrayList<>();
-//    ArrayList<Pose> put_second_wobble = new ArrayList<>();
 
 
+    ArrayList<Pose2d> A_move_to_shoot = new ArrayList<>();
+    ArrayList<Pose2d> A_put_first_wobble = new ArrayList<>();
+    ArrayList<Pose2d> A_grab_second_wobble = new ArrayList<>();
+    ArrayList<Pose2d> A_put_second_wobble = new ArrayList<>();
+    ArrayList<Pose2d> A_go_line = new ArrayList<>();
 
-    ArrayList<Pose2d> C_put_first_wobble = new ArrayList<>();
-    ArrayList<Pose2d> C_release_1 = new ArrayList<>();
+    ArrayList<Pose2d> B_move_to_shoot = new ArrayList<>();
+    ArrayList<Pose2d> B_put_first_wobble = new ArrayList<>();
+    ArrayList<Pose2d> B_move_to_shoot_2 = new ArrayList<>();
+    ArrayList<Pose2d> B_grab_second_wobble = new ArrayList<>();
+    ArrayList<Pose2d> B_put_second_wobble = new ArrayList<>();
+    ArrayList<Pose2d> B_go_line = new ArrayList<>();
+
     ArrayList<Pose2d> C_move_to_shoot = new ArrayList<>();
+    ArrayList<Pose2d> C_put_first_wobble = new ArrayList<>();
     ArrayList<Pose2d> C_move_to_shoot_2 = new ArrayList<>();
     ArrayList<Pose2d> C_grab_second_wobble = new ArrayList<>();
     ArrayList<Pose2d> C_put_second_wobble = new ArrayList<>();
@@ -112,14 +121,19 @@ public class LucusAuto1 extends OpMode {
         if (lucus.stage == C_Stage.Start.ordinal()) {
             lucus.nextStage();
         }
+
+        /**
+         * Shoot
+         */
         else if (lucus.stage == C_Stage.move_to_shoot.ordinal()) {
             if (lucus.moveTo(C_move_to_shoot)) lucus.nextStage();
-//            louis.arm_down();
-//            louis.shooter_shoot();
         }
         else if (lucus.stage == C_Stage.shoot.ordinal()) {
             if (lucus.shoot_3_ring()) lucus.nextStage();
         }
+        /**
+         * First wobble
+         */
         else if (lucus.stage == C_Stage.put_fist_wobble.ordinal()) {
             if (lucus.moveTo(C_put_first_wobble)) lucus.nextStage();
             lucus.arm_down();
@@ -128,12 +142,14 @@ public class LucusAuto1 extends OpMode {
             lucus.claw_release();
             lucus.nextStage();
         }
+        /**
+         * Shoot 2
+         */
         else if (lucus.stage == C_Stage.move_to_shoot_2.ordinal()) {
             if (lucus.moveTo(C_move_to_shoot_2)) lucus.nextStage();
             if(lucus.pose_index <= 1);
             else if(lucus.pose_index == 2){
                 lucus.control.time_mult = 3;
-
             }
             else lucus.control.time_mult = 1.3;
             lucus.suck_spin();
@@ -141,6 +157,9 @@ public class LucusAuto1 extends OpMode {
         else if (lucus.stage == C_Stage.shoot_2.ordinal()) {
             if (lucus.shoot_3_ring()) lucus.nextStage();
         }
+        /**
+         * Wobble 2
+         */
         else if (lucus.stage == C_Stage.grab_second_wobble.ordinal()) {
             if (lucus.moveTo(C_grab_second_wobble)) lucus.nextStage();
             lucus.arm_down();
@@ -156,15 +175,15 @@ public class LucusAuto1 extends OpMode {
         }
         else if(lucus.stage == C_Stage.release_2.ordinal()){
             if(lucus.stage_timer.seconds() >= 1) lucus.nextStage();
-            if(lucus.stage_timer.seconds() <= 0.5) lucus.arm_down();
-            else {
-                lucus.claw_release();
-            }
+             lucus.arm_down();
+             lucus.claw_release();
         }
+        /**
+         * Line
+         */
         else if (lucus.stage == C_Stage.go_line.ordinal()) {
             if (lucus.moveTo(C_go_line)) lucus.nextStage();
             lucus.arm_up();
-
         }
         else if (lucus.stage == C_Stage.End.ordinal()) {
             lucus.stop_all();
@@ -175,6 +194,7 @@ public class LucusAuto1 extends OpMode {
     void setup_trajectory(){
 
         lucus.setStartPose(new Pose2d(-150, -150, Math.toRadians(180)));
+
 
         /**
          * C
