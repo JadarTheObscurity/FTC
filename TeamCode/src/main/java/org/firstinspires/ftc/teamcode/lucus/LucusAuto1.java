@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.lucus;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import static org.firstinspires.ftc.teamcode.lucus.LucusAuto1.TargetZone.*;
 
 @Autonomous(name = "Lucus Auto 1", group = "Lucus")
+@Disabled
 public class LucusAuto1 extends OpMode {
     Lucus lucus;
     FtcDashboard dashboard;

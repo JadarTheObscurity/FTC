@@ -135,12 +135,13 @@ public class JadarControl {
     }
 
     public boolean moveTo_OW(Pose2d start, Pose2d end, Pose2d curr){
-        Pose2d rel = Pose2d.det_pose(start, end);
-        double s = Math.hypot(rel.getX(), rel.getY());
+//        double s = Math.hypot(rel.getX(), rel.getY());
         //Calculate how long does it takes to reach to the target position
-        double slide_time = max(s/2/ MecanumDriveTrain.max_v, sqrt(s/2/ MecanumDriveTrain.max_a));
-        double turn_time = max(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_w, sqrt(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_alpha));
-        double total_time = max(slide_time, turn_time);
+//        double slide_time = max(s/2/ MecanumDriveTrain.max_v, sqrt(s/2/ MecanumDriveTrain.max_a));
+//        double turn_time = max(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_w, sqrt(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_alpha));
+//        double total_time = max(slide_time, turn_time);
+
+        double total_time = getTotalTime(start, end);
 
         total_time *= time_mult;
 
@@ -151,6 +152,7 @@ public class JadarControl {
         }
 
 
+        Pose2d rel = Pose2d.det_pose(start, end);
 
         //find the error between the robot's current position and where it should be)
         x_target = s_of_t(rel.getX(), timer.seconds(), total_time);
@@ -227,7 +229,7 @@ public class JadarControl {
         //Calculate how long does it takes to reach to the target position
         double slide_time = max(s/2/ MecanumDriveTrain.max_v, sqrt(s/2/ MecanumDriveTrain.max_a));
         double turn_time = max(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_w, sqrt(abs(rel.getR(AngleUnit.DEGREES))/2/ MecanumDriveTrain.max_alpha));
-        double total_time = max(slide_time, turn_time);
+        double total_time = slide_time + turn_time;
         return total_time;
     }
 

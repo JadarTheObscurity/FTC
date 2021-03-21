@@ -74,8 +74,8 @@ public class MecanumDriveTrain {
     double motor_tpr = 537.6;
     double wheel_diameter =10.16;
 
-
     double x_ratio = 120.0/145;
+    double y_ratio = 1;
     public double get_x(){
         double raw_x =  (motors.get(0).getCurrentPosition() - last_pos[0]) -
                         (motors.get(1).getCurrentPosition() - last_pos[1]) +
@@ -89,7 +89,7 @@ public class MecanumDriveTrain {
                         (motors.get(1).getCurrentPosition() - last_pos[1]) -
                         (motors.get(2).getCurrentPosition() - last_pos[2]) -
                         (motors.get(3).getCurrentPosition() - last_pos[3]);
-        return raw_y / 4 * 2 * Math.PI / motor_tpr * wheel_diameter / 2;
+        return raw_y / 4 * 2 * Math.PI / motor_tpr * wheel_diameter / 2 * y_ratio;
     }
 
     public double get_r(){

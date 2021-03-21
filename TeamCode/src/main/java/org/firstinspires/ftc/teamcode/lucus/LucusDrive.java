@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.lucus;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 
 @TeleOp(name="Lucus Drive", group = "Lucus")
+@Disabled
 public class LucusDrive extends OpMode {
     Lucus lucus;
     @Override

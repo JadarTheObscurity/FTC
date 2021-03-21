@@ -2,17 +2,15 @@ package org.firstinspires.ftc.teamcode.test;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.Webcam;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
+import org.firstinspires.ftc.teamcode.util.Webcam;
 import org.opencv.core.Point;
 
 @Config
 @TeleOp(name = "Webcam Tower Tuner", group = "Test")
-@Disabled
 public class Webcam_Tower extends OpMode {
     FtcDashboard dashboard;
     TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Blue);
