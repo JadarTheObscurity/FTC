@@ -59,6 +59,23 @@ public class Johanson extends OpMode {
 
     @Override
     public void init() {
+        setUpHardware();
+        heading=x_cm=y_cm=0;
+        ow_thread.start();
+        setStartPose(new Pose2d(0, 0, 0));
+    }
+
+    @Override
+    public void loop() {
+       update();
+    }
+
+    @Override
+    public void stop() {
+        finish();
+    }
+
+    void setUpHardware(){
         driveTrain = new MecanumDriveTrain(hardwareMap, false);
         control = new JadarControl(driveTrain);
         arm_motor = hardwareMap.get(DcMotorEx.class, "arm");
@@ -98,22 +115,14 @@ public class Johanson extends OpMode {
         arm_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         for(LynxModule module : allHubs) module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 //        webcam = new Webcam(hardwareMap, new Point(640, 480));
-
-        heading=x_cm=y_cm=0;
-
-        ow_thread.start();
-
-        setStartPose(new Pose2d(0, 0, 0));
     }
 
-    @Override
-    public void loop() {
-       update();
-    }
-
-    @Override
-    public void stop() {
-        ow_thread.interrupt();
+    void drawRobot(){
+        packet = new TelemetryPacket();
+        fieldOverlay = packet.fieldOverlay();
+        Pose2d currentPose = new Pose2d(curr_pos.getY() * cmTOInch,-curr_pos.getX() * cmTOInch, -curr_pos.getR()+Math.toRadians(90));
+        fieldOverlay.setStroke("#3F51B5");
+        DashboardUtil.drawRobot(fieldOverlay, currentPose);
     }
 
     //State machine
@@ -175,12 +184,13 @@ public class Johanson extends OpMode {
     }
 
     public void update(){
-
-
+        drawRobot();
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public void finish(){
-
+        //Stop the dead wheel thread
+        ow_thread.interrupt();
     }
 
 
@@ -217,22 +227,16 @@ public class Johanson extends OpMode {
         double det_x = x_cm_raw - last_x_cm_raw + det_heading * x_correction_ratio;
         double det_y = y_cm_raw - last_y_cm_raw ;
 
+        //TODO Add @det_heading to below to see whether it will be better
         x_cm += Math.cos(heading) * det_x - Math.sin(heading) * det_y;
         y_cm += Math.sin(heading) * det_x + Math.cos(heading) * det_y;
         last_x_cm_raw = x_cm_raw;
         last_y_cm_raw = y_cm_raw;
         curr_pos.set(x_cm + start_pos.getX(), y_cm + start_pos.getY(), heading);
-
-        packet = new TelemetryPacket();
-        fieldOverlay = packet.fieldOverlay();
-        Pose2d currentPose = new Pose2d(curr_pos.getY() * cmTOInch,-curr_pos.getX() * cmTOInch, -curr_pos.getR()+Math.toRadians(90));
-        fieldOverlay.setStroke("#3F51B5");
-        DashboardUtil.drawRobot(fieldOverlay, currentPose);
-        dashboard.sendTelemetryPacket(packet);
     }
 
 
-private static class OdometryWheelThread extends Thread{
+    private static class OdometryWheelThread extends Thread{
     public void run(){
         try
         {
@@ -247,6 +251,8 @@ private static class OdometryWheelThread extends Thread{
 
     }
 }
+
+//==============================================================================================================================
 
     public void arm_up(){
         arm_motor.setTargetPosition(0);

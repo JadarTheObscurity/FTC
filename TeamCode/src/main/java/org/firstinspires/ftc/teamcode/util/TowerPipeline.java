@@ -80,6 +80,17 @@ public class TowerPipeline extends OpenCvPipeline {
      * constantly allocating and freeing large chunks of memory.
      */
 
+    public void setTarget(Tower tower){
+        switch (tower){
+            case Blue:
+                curr_hsv = blue_hsv;
+                break;
+            case Red:
+                curr_hsv = red_hsv;
+                break;
+        }
+    }
+
     @Override
     public void init(Mat input){
 
@@ -200,6 +211,10 @@ public class TowerPipeline extends OpenCvPipeline {
                                 int max_v){
 
        curr_hsv = new HSV_threshold(min_h, max_h, min_s, max_s, min_v, max_v);
+    }
+
+    public void setHSVThreshold(HSV_threshold threshold){
+        curr_hsv = threshold.copy();
     }
 
     void createMask(Mat src, Mat dst){

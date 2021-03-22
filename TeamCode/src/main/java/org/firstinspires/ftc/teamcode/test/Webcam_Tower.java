@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.HSV_threshold;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
 import org.firstinspires.ftc.teamcode.util.Webcam;
 import org.opencv.core.Point;
@@ -17,12 +18,8 @@ public class Webcam_Tower extends OpMode {
     Webcam webcam;
 
     public static int pipline_stage = 0;
-    public static int min_h = 100;
-    public static int max_h = 130;
-    public static int min_s = 30;
-    public static int max_s = 255;
-    public static int min_v = 230;
-    public static int max_v = 255;
+    public static int target = 0;
+    public static HSV_threshold threshold = new HSV_threshold(0, 180, 0, 255, 0, 255);
 
     @Override
     public void init() {
@@ -35,6 +32,6 @@ public class Webcam_Tower extends OpMode {
     @Override
     public void loop() {
         TowerPipeline.curr_stage =pipline_stage;
-        pipeline.setHSVThreshold(min_h, max_h, min_s, max_s, min_v, max_v);
+        pipeline.setHSVThreshold(threshold);
     }
 }
