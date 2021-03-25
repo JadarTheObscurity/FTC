@@ -19,7 +19,7 @@ public class Webcam_Tower extends OpMode {
 
     public static int pipline_stage = 0;
     public static int target = 0;
-    public static HSV_threshold threshold = new HSV_threshold(0, 180, 0, 255, 0, 255);
+    public static HSV_threshold threshold = TowerPipeline.blue_hsv.copy();
 
     @Override
     public void init() {

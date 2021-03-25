@@ -177,11 +177,6 @@ public class JadarControl {
         double robot_vx_target = vx_target * Math.cos(curr.getR()) + vy_target * Math.sin(curr.getR());
         double robot_vy_target = -vx_target * Math.sin(curr.getR()) + vy_target * Math.cos(curr.getR());
 
-
-//        if(timer.seconds() > total_time / 2){
-//            if(sameSign(y, y_error)) y_error = 0;
-//        }
-
         //P control
 //        double x_power = Range.clip(robot_vx_target / driveTrain.x_pv_ratio + robot_x_error * x_kp, -power_limit_x, power_limit_x);
 //        double y_power = Range.clip(robot_vy_target / driveTrain.y_pv_ratio + robot_y_error * y_kp, -power_limit_x, power_limit_x);
@@ -191,9 +186,12 @@ public class JadarControl {
 
 
 
-
         // add extra 0.1 second to yeah you know what I mean
-        if(timer.seconds() > total_time + 0.2 && Pose2d.det_pose(curr, end).getlength() <= 5){
+        boolean times_up = timer.seconds() > total_time + 0.1;
+        // position and time out
+        boolean to_destine =  Pose2d.det_pose(curr, end).getlength() <= 5 || timer.seconds() > total_time + 0.5;
+
+        if(times_up || to_destine){
             driveTrain.move(0, 0, 0);
             return true;
         }
@@ -212,6 +210,10 @@ public class JadarControl {
             return s / total_time / 2 * Math.PI * Math.sin(t / total_time * Math.PI);
         }
         return 0;
+    }
+
+    void moving(Pose2d rel, double total_time){
+
     }
 
     double clipAngleDegree(double a, double b){

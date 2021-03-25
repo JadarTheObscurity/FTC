@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.johanson;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 
@@ -9,12 +10,13 @@ import java.util.ArrayList;
 
 
 @Autonomous(group = "Johanson")
-public class JohansonAuto extends Johanson {
+public class JohansonAuto extends OpMode {
+    Johanson johanson;
     @Override
     public void init() {
-        super.init();
+        johanson = new Johanson(hardwareMap);
         setup_trajectory();
-        claw_grab();
+        johanson.claw_grab();
     }
 
     @Override
@@ -25,7 +27,7 @@ public class JohansonAuto extends Johanson {
 
     @Override
     public void loop() {
-        super.loop();
+
         switch(zone){
             case A:
                 A_state_machine();
@@ -37,6 +39,12 @@ public class JohansonAuto extends Johanson {
                 C_state_machine();
                 break;
         }
+        johanson.update();
+    }
+
+    @Override
+    public void stop() {
+        johanson.finish();
     }
 
     enum TargetZone{
@@ -110,209 +118,209 @@ public class JohansonAuto extends Johanson {
     ArrayList<Pose2d> C_go_line = new ArrayList<>();
 
     void A_state_machine(){
-        if (stage == A_Stage.Start.ordinal()) {
-            nextStage();
+        if (johanson.stage == A_Stage.Start.ordinal()) {
+            johanson.nextStage();
         }
         /**
          * Shoot
          */
-        else if (stage == A_Stage.move_to_shoot.ordinal()) {
-            if (moveTo(A_move_to_shoot)) nextStage();
+        else if (johanson.stage == A_Stage.move_to_shoot.ordinal()) {
+            if (johanson.moveTo(A_move_to_shoot)) johanson.nextStage();
         }
-        else if (stage == A_Stage.shoot.ordinal()) {
-            if (shoot_3_ring()) nextStage();
+        else if (johanson.stage == A_Stage.shoot.ordinal()) {
+            if (johanson.shoot_3_ring()) johanson.nextStage();
         }
         /**
          * First wobble
          */
-        else if (stage == A_Stage.put_fist_wobble.ordinal()) {
-            if (moveTo(A_put_first_wobble)) nextStage();
-            arm_down();
+        else if (johanson.stage == A_Stage.put_fist_wobble.ordinal()) {
+            if (johanson.moveTo(A_put_first_wobble)) johanson.nextStage();
+            johanson.arm_down();
         }
-        else if(stage == A_Stage.release_1.ordinal()){
-            claw_release();
-            nextStage();
+        else if(johanson.stage == A_Stage.release_1.ordinal()){
+            johanson.claw_release();
+            johanson.nextStage();
         }
 
         /**
          * Wobble 2
          */
-        else if (stage == A_Stage.grab_second_wobble.ordinal()) {
-            if (moveTo(A_grab_second_wobble)) nextStage();
-            arm_down();
-            claw_release();
+        else if (johanson.stage == A_Stage.grab_second_wobble.ordinal()) {
+            if (johanson.moveTo(A_grab_second_wobble)) johanson.nextStage();
+            johanson.arm_down();
+            johanson.claw_release();
         }
-        else if(stage == A_Stage.grab.ordinal()){
-            if(stage_timer.seconds() >= 0.7) nextStage();
-            claw_grab();
+        else if(johanson.stage == A_Stage.grab.ordinal()){
+            if(johanson.stage_timer.seconds() >= 0.7) johanson.nextStage();
+            johanson.claw_grab();
         }
-        else if (stage == A_Stage.put_second_wobble.ordinal()) {
-            if (moveTo(A_put_second_wobble)) nextStage();
-            arm_up();
+        else if (johanson.stage == A_Stage.put_second_wobble.ordinal()) {
+            if (johanson.moveTo(A_put_second_wobble)) johanson.nextStage();
+            johanson.arm_up();
         }
-        else if(stage == A_Stage.release_2.ordinal()){
-            if(stage_timer.seconds() >= 1) nextStage();
-            arm_down();
-            claw_release();
+        else if(johanson.stage == A_Stage.release_2.ordinal()){
+            if(johanson.stage_timer.seconds() >= 1) johanson.nextStage();
+            johanson.arm_down();
+            johanson.claw_release();
         }
         /**
          * Line
          */
-        else if (stage == A_Stage.go_line.ordinal()) {
-            if (moveTo(A_go_line)) nextStage();
-            arm_up();
+        else if (johanson.stage == A_Stage.go_line.ordinal()) {
+            if (johanson.moveTo(A_go_line)) johanson.nextStage();
+            johanson.arm_up();
         }
-        else if (stage == A_Stage.End.ordinal()) {
-            stop_all();
-            arm_up();
+        else if (johanson.stage == A_Stage.End.ordinal()) {
+            johanson.stop_all();
+            johanson.arm_up();
         }
     }
 
     void B_state_machine(){
-        if (stage == B_Stage.Start.ordinal()) {
-            nextStage();
+        if (johanson.stage == B_Stage.Start.ordinal()) {
+            johanson.nextStage();
         }
 
         /**
          * Shoot
          */
-        else if (stage == B_Stage.move_to_shoot.ordinal()) {
-            if (moveTo(B_move_to_shoot)) nextStage();
+        else if (johanson.stage == B_Stage.move_to_shoot.ordinal()) {
+            if (johanson.moveTo(B_move_to_shoot)) johanson.nextStage();
         }
-        else if (stage == B_Stage.shoot.ordinal()) {
-            if (shoot_3_ring()) nextStage();
+        else if (johanson.stage == B_Stage.shoot.ordinal()) {
+            if (johanson.shoot_3_ring()) johanson.nextStage();
         }
         /**
          * First wobble
          */
-        else if (stage == B_Stage.put_fist_wobble.ordinal()) {
-            if (moveTo(B_put_first_wobble)) nextStage();
-            arm_down();
+        else if (johanson.stage == B_Stage.put_fist_wobble.ordinal()) {
+            if (johanson.moveTo(B_put_first_wobble)) johanson.nextStage();
+            johanson.arm_down();
         }
-        else if(stage == B_Stage.release_1.ordinal()){
-            claw_release();
-            nextStage();
+        else if(johanson.stage == B_Stage.release_1.ordinal()){
+            johanson.claw_release();
+            johanson.nextStage();
         }
         /**
          * Shoot 2
          */
-        else if (stage == B_Stage.move_to_shoot_2.ordinal()) {
-            if (moveTo(B_move_to_shoot_2)) nextStage();
-            if(pose_index <= 1);
-            else if(pose_index == 2){
-                control.time_mult = 3;
+        else if (johanson.stage == B_Stage.move_to_shoot_2.ordinal()) {
+            if (johanson.moveTo(B_move_to_shoot_2)) johanson.nextStage();
+            if(johanson.pose_index <= 1);
+            else if(johanson.pose_index == 2){
+                johanson.control.time_mult = 3;
             }
-            else control.time_mult = 1.3;
-            suck_spin();
+            else johanson.control.time_mult = 1.3;
+            johanson.suck_spin();
         }
-        else if (stage == B_Stage.shoot_2.ordinal()) {
-            if (shoot_3_ring()) nextStage();
+        else if (johanson.stage == B_Stage.shoot_2.ordinal()) {
+            if (johanson.shoot_3_ring()) johanson.nextStage();
         }
         /**
          * Wobble 2
          */
-        else if (stage == B_Stage.grab_second_wobble.ordinal()) {
-            if (moveTo(B_grab_second_wobble)) nextStage();
-            arm_down();
-            claw_release();
+        else if (johanson.stage == B_Stage.grab_second_wobble.ordinal()) {
+            if (johanson.moveTo(B_grab_second_wobble)) johanson.nextStage();
+            johanson.arm_down();
+            johanson.claw_release();
         }
-        else if(stage == B_Stage.grab.ordinal()){
-            if(stage_timer.seconds() >= 0.7) nextStage();
-            claw_grab();
+        else if(johanson.stage == B_Stage.grab.ordinal()){
+            if(johanson.stage_timer.seconds() >= 0.7) johanson.nextStage();
+            johanson.claw_grab();
         }
-        else if (stage == B_Stage.put_second_wobble.ordinal()) {
-            if (moveTo(B_put_second_wobble)) nextStage();
-            arm_up();
+        else if (johanson.stage == B_Stage.put_second_wobble.ordinal()) {
+            if (johanson.moveTo(B_put_second_wobble)) johanson.nextStage();
+            johanson.arm_up();
         }
-        else if(stage == B_Stage.release_2.ordinal()){
-            if(stage_timer.seconds() >= 1) nextStage();
-            arm_down();
-            claw_release();
+        else if(johanson.stage == B_Stage.release_2.ordinal()){
+            if(johanson.stage_timer.seconds() >= 1) johanson.nextStage();
+            johanson.arm_down();
+            johanson.claw_release();
         }
         /**
          * Line
          */
-        else if (stage == B_Stage.go_line.ordinal()) {
-            if (moveTo(B_go_line)) nextStage();
-            arm_up();
+        else if (johanson.stage == B_Stage.go_line.ordinal()) {
+            if (johanson.moveTo(B_go_line)) johanson.nextStage();
+            johanson.arm_up();
         }
-        else if (stage == B_Stage.End.ordinal()) {
-            stop_all();
-            arm_up();
+        else if (johanson.stage == B_Stage.End.ordinal()) {
+            johanson.stop_all();
+            johanson.arm_up();
         }
     }
 
     void C_state_machine(){
-        if (stage == C_Stage.Start.ordinal()) {
-            nextStage();
+        if (johanson.stage == C_Stage.Start.ordinal()) {
+            johanson.nextStage();
         }
 
         /**
          * Shoot
          */
-        else if (stage == C_Stage.move_to_shoot.ordinal()) {
-            if (moveTo(C_move_to_shoot)) nextStage();
+        else if (johanson.stage == C_Stage.move_to_shoot.ordinal()) {
+            if (johanson.moveTo(C_move_to_shoot)) johanson.nextStage();
         }
-        else if (stage == C_Stage.shoot.ordinal()) {
-            if (shoot_3_ring()) nextStage();
+        else if (johanson.stage == C_Stage.shoot.ordinal()) {
+            if (johanson.shoot_3_ring()) johanson.nextStage();
         }
         /**
          * First wobble
          */
-        else if (stage == C_Stage.put_fist_wobble.ordinal()) {
-            if (moveTo(C_put_first_wobble)) nextStage();
-            arm_down();
+        else if (johanson.stage == C_Stage.put_fist_wobble.ordinal()) {
+            if (johanson.moveTo(C_put_first_wobble)) johanson.nextStage();
+            johanson.arm_down();
         }
-        else if(stage == C_Stage.release_1.ordinal()){
-            claw_release();
-            nextStage();
+        else if(johanson.stage == C_Stage.release_1.ordinal()){
+            johanson.claw_release();
+            johanson.nextStage();
         }
         /**
          * Shoot 2
          */
-        else if (stage == C_Stage.move_to_shoot_2.ordinal()) {
-            if (moveTo(C_move_to_shoot_2)) nextStage();
-            if(pose_index <= 1);
-            else if(pose_index == 2){
-                control.time_mult = 3;
+        else if (johanson.stage == C_Stage.move_to_shoot_2.ordinal()) {
+            if (johanson.moveTo(C_move_to_shoot_2)) johanson.nextStage();
+            if(johanson.pose_index <= 1);
+            else if(johanson.pose_index == 2){
+                johanson.control.time_mult = 3;
             }
-            else control.time_mult = 1.3;
-            suck_spin();
+            else johanson.control.time_mult = 1.3;
+            johanson.suck_spin();
         }
-        else if (stage == C_Stage.shoot_2.ordinal()) {
-            if (shoot_3_ring()) nextStage();
+        else if (johanson.stage == C_Stage.shoot_2.ordinal()) {
+            if (johanson.shoot_3_ring()) johanson.nextStage();
         }
         /**
          * Wobble 2
          */
-        else if (stage == C_Stage.grab_second_wobble.ordinal()) {
-            if (moveTo(C_grab_second_wobble)) nextStage();
-            arm_down();
-            claw_release();
+        else if (johanson.stage == C_Stage.grab_second_wobble.ordinal()) {
+            if (johanson.moveTo(C_grab_second_wobble)) johanson.nextStage();
+            johanson.arm_down();
+            johanson.claw_release();
         }
-        else if(stage == C_Stage.grab.ordinal()){
-            if(stage_timer.seconds() >= 0.7) nextStage();
-            claw_grab();
+        else if(johanson.stage == C_Stage.grab.ordinal()){
+            if(johanson.stage_timer.seconds() >= 0.7) johanson.nextStage();
+            johanson.claw_grab();
         }
-        else if (stage == C_Stage.put_second_wobble.ordinal()) {
-            if (moveTo(C_put_second_wobble)) nextStage();
-            arm_up();
+        else if (johanson.stage == C_Stage.put_second_wobble.ordinal()) {
+            if (johanson.moveTo(C_put_second_wobble)) johanson.nextStage();
+            johanson.arm_up();
         }
-        else if(stage == C_Stage.release_2.ordinal()){
-            if(stage_timer.seconds() >= 1) nextStage();
-            arm_down();
-            claw_release();
+        else if(johanson.stage == C_Stage.release_2.ordinal()){
+            if(johanson.stage_timer.seconds() >= 1) johanson.nextStage();
+            johanson.arm_down();
+            johanson.claw_release();
         }
         /**
          * Line
          */
-        else if (stage == C_Stage.go_line.ordinal()) {
-            if (moveTo(C_go_line)) nextStage();
-            arm_up();
+        else if (johanson.stage == C_Stage.go_line.ordinal()) {
+            if (johanson.moveTo(C_go_line)) johanson.nextStage();
+            johanson.arm_up();
         }
-        else if (stage == C_Stage.End.ordinal()) {
-            stop_all();
-            arm_up();
+        else if (johanson.stage == C_Stage.End.ordinal()) {
+            johanson.stop_all();
+            johanson.arm_up();
         }
     }
 
@@ -324,7 +332,7 @@ public class JohansonAuto extends Johanson {
 
     void setup_trajectory(){
 
-        setStartPose(start_pos);
+        johanson.setStartPose(start_pos);
 
 
         /**

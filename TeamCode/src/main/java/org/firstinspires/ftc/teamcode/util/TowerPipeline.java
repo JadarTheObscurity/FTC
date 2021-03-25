@@ -49,8 +49,8 @@ public class TowerPipeline extends OpenCvPipeline {
         Red
     }
 
-    final HSV_threshold blue_hsv = new HSV_threshold(100, 130, 30, 255, 200, 255);
-    final HSV_threshold red_hsv = new HSV_threshold(0, 255, 0, 255, 0, 255);
+    public static HSV_threshold blue_hsv = new HSV_threshold(100, 130, 30, 255, 200, 255);
+    static HSV_threshold red_hsv = new HSV_threshold(0, 255, 0, 255, 0, 255);
 
     HSV_threshold curr_hsv;
 

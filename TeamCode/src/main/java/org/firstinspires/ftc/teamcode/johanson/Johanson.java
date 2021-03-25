@@ -4,9 +4,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.util.Webcam;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Johanson extends OpMode {
+public class Johanson{
 
     public MecanumDriveTrain driveTrain;
     JadarControl control;
@@ -57,25 +57,14 @@ public class Johanson extends OpMode {
     final double clawState_catch=0.3;
     final double shoot_duration = 0.6;
 
-    @Override
-    public void init() {
-        setUpHardware();
+    public Johanson(HardwareMap hardwareMap) {
+        setUpHardware(hardwareMap);
         heading=x_cm=y_cm=0;
         ow_thread.start();
         setStartPose(new Pose2d(0, 0, 0));
     }
 
-    @Override
-    public void loop() {
-       update();
-    }
-
-    @Override
-    public void stop() {
-        finish();
-    }
-
-    void setUpHardware(){
+    void setUpHardware(HardwareMap hardwareMap){
         driveTrain = new MecanumDriveTrain(hardwareMap, false);
         control = new JadarControl(driveTrain);
         arm_motor = hardwareMap.get(DcMotorEx.class, "arm");
