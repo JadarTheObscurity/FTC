@@ -23,16 +23,13 @@ public class TowerPipeline extends OpenCvPipeline {
 
 
     Mat ROI = new Mat();
+    Mat ROI2 = new Mat();
     Mat show_HSV = new Mat();
     Mat proc_Mat = new Mat();
     Mat display_Mat = new Mat();
     Mat show_mat = new Mat();
-    public int min_h = 100;
-    public int max_h = 130;
-    public int min_s = 30;
-    public int max_s = 255;
-    public int min_v = 200;
-    public int max_v = 255;
+    Mat color_mask = new Mat();
+    Mat white_mask = new Mat();
 
     public TowerPipeline(Tower tower){
         switch (tower){
@@ -49,8 +46,9 @@ public class TowerPipeline extends OpenCvPipeline {
         Red
     }
 
-    public static HSV_threshold blue_hsv = new HSV_threshold(100, 130, 30, 255, 200, 255);
-    static HSV_threshold red_hsv = new HSV_threshold(0, 255, 0, 255, 0, 255);
+    public static HSV_threshold blue_hsv = new HSV_threshold(90, 120, 30, 255, 170, 255);
+    public static HSV_threshold red_hsv = new HSV_threshold(0, 10, 30, 255, 170, 255);
+    public static HSV_threshold white_hsv = new HSV_threshold(0, 180, 0, 30, 200, 255);
 
     HSV_threshold curr_hsv;
 
@@ -109,7 +107,7 @@ public class TowerPipeline extends OpenCvPipeline {
 
         Imgproc.resize(input, input, new Size(show_resolution.x, show_resolution.y));
         input.copyTo(show_mat);
-        createMask(input, show_HSV);
+        createColorMask(input, show_HSV);
         findTower(input);
 
 
@@ -122,7 +120,11 @@ public class TowerPipeline extends OpenCvPipeline {
             show_HSV.copyTo(display_Mat);
         }
         if(curr_stage == Stage.Debug.ordinal()) {
-            show_mat.copyTo(display_Mat);
+            if(found) {
+                Imgproc.resize(ROI2, ROI2, new Size(show_resolution.x, show_resolution.y));
+                ROI2.copyTo(display_Mat);
+            }
+//            show_mat.copyTo(display_Mat);
         }
         if(display_Mat == null) input.copyTo(display_Mat);
 
@@ -148,9 +150,9 @@ public class TowerPipeline extends OpenCvPipeline {
         //blur
         Imgproc.blur(proc_Mat, proc_Mat, new Size(3,3));
         //create mask
-        createMask(proc_Mat, proc_Mat);
+        createColorMask(proc_Mat, color_mask);
         //roi
-        ROI = new Mat(proc_Mat, new Rect(pointA, pointB));
+        ROI = new Mat(color_mask, new Rect(pointA, pointB));
         //find contour
         contours = new ArrayList<>();
         hierarchy = new Mat();
@@ -199,6 +201,12 @@ public class TowerPipeline extends OpenCvPipeline {
                     new Point(boundRect[index].br().x * x_ratio, boundRect[index].br().y * y_ratio), new Scalar(0, 255, 0), 3);
         }
 
+        //Search for white
+        if(found){
+            createWhiteMask(proc_Mat, white_mask);
+            ROI2 = new Mat(white_mask, boundRect[index]);
+        }
+
 
     }
 
@@ -216,10 +224,18 @@ public class TowerPipeline extends OpenCvPipeline {
     public void setHSVThreshold(HSV_threshold threshold){
         curr_hsv = threshold.copy();
     }
+    public void setWhiteHSVThreshold(HSV_threshold threshold){
+        white_hsv = threshold.copy();
+    }
 
-    void createMask(Mat src, Mat dst){
+    void createColorMask(Mat src, Mat dst){
         Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
         Core.inRange(dst,curr_hsv.min(), curr_hsv.max(), dst);
+    }
+
+    void createWhiteMask(Mat src, Mat dst){
+        Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
+        Core.inRange(dst,white_hsv.min(), white_hsv.max(), dst);
     }
 }
 

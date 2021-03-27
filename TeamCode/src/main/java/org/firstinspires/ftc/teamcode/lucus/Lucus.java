@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.lucus;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,7 +20,6 @@ import org.firstinspires.ftc.teamcode.util.Webcam;
 import java.util.ArrayList;
 import java.util.List;
 
-@Config
 public class Lucus {
     public MecanumDriveTrain driveTrain;
     JadarControl control;
@@ -105,7 +103,7 @@ public class Lucus {
 
     //Drive Train Behavior
     public int pose_index = 0;
-    public boolean moveTo(Pose2d target){return control.moveTo_OW(last_pos, target, curr_pos );}
+    public boolean moveTo(Pose2d target){return control.moveTo(last_pos, target, curr_pos );}
     public boolean moveTo(ArrayList<Pose2d> ps){
         if(pose_index >= ps.size()) return true;
         if(moveTo(ps.get(pose_index))) {

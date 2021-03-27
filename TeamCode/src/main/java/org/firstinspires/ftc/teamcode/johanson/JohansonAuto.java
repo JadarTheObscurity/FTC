@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.johanson;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.util.Pose2d;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 
 
 @Autonomous(group = "Johanson")
+@Disabled
 public class JohansonAuto extends OpMode {
     Johanson johanson;
     @Override

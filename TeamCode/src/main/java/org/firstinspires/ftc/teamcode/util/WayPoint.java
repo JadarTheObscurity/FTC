@@ -10,4 +10,12 @@ public class WayPoint extends Pose2d{
         super(x, y, r);
         this.time = time;
     }
+
+    public Pose2d getPose2d(){
+        return new Pose2d(getX(), getY(), getR());
+    }
+
+    public double getTime(){
+        return time;
+    }
 }

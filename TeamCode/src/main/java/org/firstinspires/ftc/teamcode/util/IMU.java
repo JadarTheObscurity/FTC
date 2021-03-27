@@ -18,11 +18,9 @@ public class IMU {
 
     // State used for updating telemetry
     Orientation angles;
-    public IMU(BNO055IMU imu){
-        this.imu = imu;
-    }
     public IMU(HardwareMap hardwareMap){
         this.imu = hardwareMap.get(BNO055IMU.class, "imu");
+        init();
     }
     public void init(){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

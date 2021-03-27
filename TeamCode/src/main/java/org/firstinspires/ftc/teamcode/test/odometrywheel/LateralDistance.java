@@ -36,7 +36,7 @@ public class LateralDistance extends OpMode {
 
         telemetry.addData("heading", heading);
         telemetry.addData("x", x_value);
-        telemetry.addData("ratio", x_value / heading / 180 * Math.PI);
+        telemetry.addData("ratio", x_value / heading * 180 / Math.PI);
         telemetry.update();
     }
 }

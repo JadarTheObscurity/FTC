@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.johanson;
+package org.firstinspires.ftc.teamcode.andrew;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.Webcam;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Johanson{
+public class Andrew {
 
     public MecanumDriveTrain driveTrain;
     JadarControl control;
@@ -45,12 +45,12 @@ public class Johanson{
     static Thread ow_thread = new OdometryWheelThread();
 
 
-    final double shootPower = 1;
-    final double suckPower = -0.7;
-    final double reversesuckPower = 1;
-    final double plateState_collect = 0.14;
-    final double plateState_lift = 0.33;
-    final double pushState_wait = 0.1;
+    final double shootPower = -1;
+    final double suckPower = 1;
+    final double reversesuckPower = -0.7;
+    final double plateState_collect = 0.1;
+    final double plateState_lift = 0.3;
+    final double pushState_wait = 0;
     final double pushState_push = 0.55;
     final double armState_up=0;
     final double armState_down=0;
@@ -58,7 +58,7 @@ public class Johanson{
     final double clawState_catch=0.5;//0.3
     final double shoot_duration = 0.6;
 
-    public Johanson(HardwareMap hardwareMap) {
+    public Andrew(HardwareMap hardwareMap) {
         setUpHardware(hardwareMap);
         heading=x_cm=y_cm=0;
         ow_thread.start();
@@ -109,7 +109,6 @@ public class Johanson{
     }
 
     void drawRobot(){
-        packet = new TelemetryPacket();
         fieldOverlay = packet.fieldOverlay();
         Pose2d currentPose = new Pose2d(curr_pos.getY() * cmTOInch,-curr_pos.getX() * cmTOInch, -curr_pos.getR()+Math.toRadians(90));
         fieldOverlay.setStroke("#3F51B5");
@@ -183,11 +182,16 @@ public class Johanson{
         drawRobot();
         packet.put("pose", curr_pos.toString());
         dashboard.sendTelemetryPacket(packet);
+        packet = new TelemetryPacket();
     }
 
     public void finish(){
         //Stop the dead wheel thread
         ow_thread.interrupt();
+    }
+
+    public void put_packet(String s, double n){
+        packet.put(s, n);
     }
 
 
@@ -206,22 +210,22 @@ public class Johanson{
      *Dead wheel
      *all measured in cm
      */
-    static double dead_wheel_diameter = 5.7;
+    static double dead_wheel_diameter = 4.8;
     static double lateral_distance = 37;
-    static double forward_offset = 0.1;//6
-    static double encoder_cpr = 1460;
+    static double forward_offset = 15;
+    static double encoder_cpr = 8192;
     static double cpr_to_rad = 2 * pi / encoder_cpr;
-    static double distance_ratio = 0.0128;//dead_wheel_diameter/ 2 * cpr_to_rad;
-    static double spin_ratio = dead_wheel_diameter / lateral_distance * cpr_to_rad * 1.0322;
-    public static double x_correction_ratio = 0.088;//dead_wheel_diameter / 2 / forward_offset * cpr_to_rad;
+    static double distance_ratio = dead_wheel_diameter/ 2 * cpr_to_rad;
+    static double spin_ratio = dead_wheel_diameter / lateral_distance * cpr_to_rad * 171.62 / 168.42 * 1080 / 1069;
+    public static double x_correction_ratio = forward_offset;
     public static void computeCoordinate(){
 
-        heading =spin_ratio * (m_ly.getCurrentPosition() + m_ry.getCurrentPosition()) / 2 + start_pos.getR();
+        heading = -spin_ratio * (m_ly.getCurrentPosition() + m_ry.getCurrentPosition()) / 2 + start_pos.getR();
         double det_heading = heading - last_heading;
         last_heading = heading;
         x_cm_raw = -(m_x.getCurrentPosition() * distance_ratio);
-        y_cm_raw = (double)(m_ry.getCurrentPosition() - m_ly.getCurrentPosition()) / 2 * distance_ratio;
-        double det_x = x_cm_raw - last_x_cm_raw + det_heading * x_correction_ratio;
+        y_cm_raw = -(double)(m_ry.getCurrentPosition() - m_ly.getCurrentPosition()) / 2 * distance_ratio;
+        double det_x = x_cm_raw - last_x_cm_raw - det_heading * x_correction_ratio;
         double det_y = y_cm_raw - last_y_cm_raw ;
 
         //TODO Add @det_heading to below to see whether it will be better

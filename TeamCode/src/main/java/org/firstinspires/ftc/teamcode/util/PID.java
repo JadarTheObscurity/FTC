@@ -18,9 +18,14 @@ public class PID {
         error_sum += error;
         double det_input = input - last_input;
         last_input = input;
-        return kp * error + ki * error_sum + kd * (last_input);
+        return kp * error + ki * error_sum + kd * (det_input);
     }
 
+    public void set(double kp, double ki, double kd){
+        this.kp = kp;
+        this.ki = ki;
+        this.kd = kd;
+    }
     public void reest(){
         error_sum = 0;
     }

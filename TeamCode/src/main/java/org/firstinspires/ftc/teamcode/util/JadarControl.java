@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -10,7 +9,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 
-@Config
+
 public class JadarControl {
     MecanumDriveTrain driveTrain;
     ElapsedTime timer = new ElapsedTime();
@@ -26,7 +25,7 @@ public class JadarControl {
 
     public static double x_kp = 0.07;
     public static double y_kp = 0.07;
-    public static double r_kp = -0.03;
+    public static double r_kp = -0.05;
     public double time_mult = 1;
 
     public double x_target = 0;
@@ -134,7 +133,7 @@ public class JadarControl {
         return false;
     }
 
-    public boolean moveTo_OW(Pose2d start, Pose2d end, Pose2d curr){
+    public boolean moveTo(Pose2d start, Pose2d end, Pose2d curr){
 //        double s = Math.hypot(rel.getX(), rel.getY());
         //Calculate how long does it takes to reach to the target position
 //        double slide_time = max(s/2/ MecanumDriveTrain.max_v, sqrt(s/2/ MecanumDriveTrain.max_a));
@@ -143,8 +142,9 @@ public class JadarControl {
 
         double total_time = getTotalTime(start, end);
 
-        total_time *= time_mult;
-
+        //total_time *= time_mult;
+        return moveTo(start, end, curr, total_time);
+    /*
         //Nothing have to be done, so return
         if(total_time == 0) {
             driveTrain.move(0, 0,0);
@@ -190,6 +190,69 @@ public class JadarControl {
         boolean times_up = timer.seconds() > total_time + 0.1;
         // position and time out
         boolean to_destine =  Pose2d.det_pose(curr, end).getlength() <= 5 || timer.seconds() > total_time + 0.5;
+
+        if(times_up || to_destine){
+            driveTrain.move(0, 0, 0);
+            return true;
+        }
+        else driveTrain.move(x_power, y_power, r_power);
+        return false;
+        */
+    }
+
+    public boolean moveTo(Pose2d start, WayPoint end, Pose2d curr){
+        double total_time = end.getTime();
+        if(total_time >= 0 ) return moveTo(start, end.getPose2d(), curr, total_time);
+        else return moveTo(start, end.getPose2d(), curr);
+    }
+
+    public boolean moveTo(Pose2d start, Pose2d end, Pose2d curr, double total_time){
+
+        //Nothing have to be done, so return
+        if(total_time == 0) {
+            driveTrain.move(0, 0,0);
+            return true;
+        }
+
+
+        Pose2d rel = Pose2d.det_pose(start, end);
+
+        //find the error between the robot's current position and where it should be)
+        x_target = s_of_t(rel.getX(), timer.seconds(), total_time);
+        y_target = s_of_t(rel.getY(), timer.seconds(), total_time);
+        r_target = s_of_t(rel.getR(AngleUnit.DEGREES), timer.seconds(), total_time);
+
+        vx_target = v_of_t(rel.getX(), timer.seconds(), total_time);
+        vy_target = v_of_t(rel.getY(), timer.seconds(), total_time);
+
+        Pose2d from_start = Pose2d.det_pose(start, curr);
+        x_error = x_target - from_start.getX();
+        y_error = y_target - from_start.getY();
+        r_error = r_target - from_start.getR(AngleUnit.DEGREES);
+
+        double power_limit_y = 1;
+        double power_limit_x = 1;
+        double power_limit_r = 1;
+
+        double robot_x_error = x_error * Math.cos(curr.getR()) + y_error * Math.sin(curr.getR());
+        double robot_y_error = -x_error * Math.sin(curr.getR()) + y_error * Math.cos(curr.getR());
+
+        double robot_vx_target = vx_target * Math.cos(curr.getR()) + vy_target * Math.sin(curr.getR());
+        double robot_vy_target = -vx_target * Math.sin(curr.getR()) + vy_target * Math.cos(curr.getR());
+
+        //P control
+//        double x_power = Range.clip(robot_vx_target / driveTrain.x_pv_ratio + robot_x_error * x_kp, -power_limit_x, power_limit_x);
+//        double y_power = Range.clip(robot_vy_target / driveTrain.y_pv_ratio + robot_y_error * y_kp, -power_limit_x, power_limit_x);
+        double x_power = Range.clip(robot_x_error * x_kp, -power_limit_x, power_limit_x);
+        double y_power = Range.clip( robot_y_error * y_kp, -power_limit_y, power_limit_y);
+        double r_power = Range.clip(r_error * r_kp, -power_limit_r, power_limit_r);
+
+
+
+        // add extra 0.1 second to yeah you know what I mean
+        boolean times_up = timer.seconds() > total_time + 0.1;
+        // position and time out
+        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 5 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 0.5;
 
         if(times_up || to_destine){
             driveTrain.move(0, 0, 0);
