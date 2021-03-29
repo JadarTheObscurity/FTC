@@ -52,8 +52,8 @@ public class Johanson{
     final double plateState_lift = 0.33;
     final double pushState_wait = 0.1;
     final double pushState_push = 0.55;
-    final double armState_up=0;
-    final double armState_down=0;
+    final double armState_up = 0;
+    final int armState_down = 1600;
     final double clawState_loose=1; //0.8
     final double clawState_catch=0.5;//0.3
     final double shoot_duration = 0.6;
@@ -256,7 +256,7 @@ public class Johanson{
         arm_motor.setPower(0.5);
     }
     public void arm_down(){
-        arm_motor.setTargetPosition(1200);
+        arm_motor.setTargetPosition(armState_down);
         arm_motor.setPower(0.4);
     }
     public void arm_stop(){

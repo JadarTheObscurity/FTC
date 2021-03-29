@@ -20,7 +20,7 @@ public class OdometryTest extends OpMode {
     public void loop() {
         double heading = imu.getHeading(AngleUnit.DEGREES);
         if(andrew.curr_pos.getR() > -Math.toRadians(1080)){
-            andrew.move(0, 0.6, 0.5);
+            andrew.move(0, 0.5, 0.3);
         }
         else {
             andrew.move(0, 0, 0);

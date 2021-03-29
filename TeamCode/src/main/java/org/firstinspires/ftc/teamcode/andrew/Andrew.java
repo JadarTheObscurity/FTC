@@ -10,13 +10,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.IMU;
 import org.firstinspires.ftc.teamcode.util.JadarControl;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveTrain;
+import org.firstinspires.ftc.teamcode.util.MyMath;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
 import org.firstinspires.ftc.teamcode.util.WayPoint;
-import org.firstinspires.ftc.teamcode.util.Webcam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +27,11 @@ public class Andrew {
 
     public MecanumDriveTrain driveTrain;
     JadarControl control;
-    Webcam webcam;
     TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Blue);
     static List<LynxModule> allHubs;
-    static DcMotorEx suck_motor, shoot_motor_1, shoot_motor_2,arm_motor;
+    public static DcMotorEx suck_motor, shoot_motor_1, shoot_motor_2,arm_motor;
     static DcMotorEx m_ly, m_ry, m_x;
+    static IMU imu;
 
     Servo claw_servo, push_servo, load_servo_l, load_servo_r;
     protected ElapsedTime shoot_timer = new ElapsedTime();
@@ -45,18 +47,19 @@ public class Andrew {
     static Thread ow_thread = new OdometryWheelThread();
 
 
-    final double shootPower = -1;
+//    final double shootPower = -1;
+    final double shootVelocity = -22000;
     final double suckPower = 1;
     final double reversesuckPower = -0.7;
     final double plateState_collect = 0.1;
-    final double plateState_lift = 0.3;
+    final double plateState_lift = 0.30;
     final double pushState_wait = 0;
-    final double pushState_push = 0.55;
+    final double pushState_push = 0.33;
     final double armState_up=0;
-    final double armState_down=0;
+    final int arm_down_pos=-1600;
     final double clawState_loose=1; //0.8
     final double clawState_catch=0.5;//0.3
-    final double shoot_duration = 0.6;
+    final double shoot_duration = 0.8;
 
     public Andrew(HardwareMap hardwareMap) {
         setUpHardware(hardwareMap);
@@ -77,6 +80,10 @@ public class Andrew {
         m_ly = hardwareMap.get(DcMotorEx.class, "lf");
         m_ry = hardwareMap.get(DcMotorEx.class, "lb");
         m_x = hardwareMap.get(DcMotorEx.class, "rf");
+
+
+        shoot_motor_1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shoot_motor_2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         m_ly.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_ly.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -105,7 +112,7 @@ public class Andrew {
         arm_motor.setTargetPosition(0);
         arm_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         for(LynxModule module : allHubs) module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-//        webcam = new Webcam(hardwareMap, new Point(640, 480));
+//        imu = new IMU(hardwareMap);
     }
 
     void drawRobot(){
@@ -155,6 +162,10 @@ public class Andrew {
         last_pos.set(pose);
         start_pos.set(pose);
         curr_pos.set(pose);
+
+        last_deadwheel_encoder[0] = m_ly.getCurrentPosition();
+        last_deadwheel_encoder[1] = m_ry.getCurrentPosition();
+        last_deadwheel_encoder[2] = m_x.getCurrentPosition();
 
         heading = pose.getR();
         last_heading = heading;
@@ -212,27 +223,39 @@ public class Andrew {
      */
     static double dead_wheel_diameter = 4.8;
     static double lateral_distance = 37;
-    static double forward_offset = 15;
+    static double forward_offset = 13.64;
     static double encoder_cpr = 8192;
-    static double cpr_to_rad = 2 * pi / encoder_cpr;
-    static double distance_ratio = dead_wheel_diameter/ 2 * cpr_to_rad;
-    static double spin_ratio = dead_wheel_diameter / lateral_distance * cpr_to_rad * 171.62 / 168.42 * 1080 / 1069;
-    public static double x_correction_ratio = forward_offset;
+    static double cpr_to_rad = 2 * Math.PI / encoder_cpr;
+    static double distance_ratio = dead_wheel_diameter / 2 * cpr_to_rad;
+    static double spin_ratio = -0.9982e-4;//dead_wheel_diameter / lateral_distance * cpr_to_rad;
+    public static double y_ratio = 312.0/308;
+    public static double x_ratio = 163.0/153;
+    public static double[] curr_deadwheel_encoder = {0, 0, 0};
+    static double ry_ratio = 1.035;
+    public static double[] last_deadwheel_encoder = {0, 0, 0};
     public static void computeCoordinate(){
 
-        heading = -spin_ratio * (m_ly.getCurrentPosition() + m_ry.getCurrentPosition()) / 2 + start_pos.getR();
-        double det_heading = heading - last_heading;
+        curr_deadwheel_encoder[0] = m_ly.getCurrentPosition();
+        curr_deadwheel_encoder[1] = m_ry.getCurrentPosition() * ry_ratio;
+        curr_deadwheel_encoder[2] = m_x.getCurrentPosition();
+
+        heading = spin_ratio * (curr_deadwheel_encoder[0] + curr_deadwheel_encoder[1]) / 2 + start_pos.getR();
+        double det_heading = MyMath.clipAngleRadian(heading - last_heading);
+
         last_heading = heading;
-        x_cm_raw = -(m_x.getCurrentPosition() * distance_ratio);
-        y_cm_raw = -(double)(m_ry.getCurrentPosition() - m_ly.getCurrentPosition()) / 2 * distance_ratio;
-        double det_x = x_cm_raw - last_x_cm_raw - det_heading * x_correction_ratio;
-        double det_y = y_cm_raw - last_y_cm_raw ;
+        x_cm_raw = -(curr_deadwheel_encoder[2] - last_deadwheel_encoder[2]) * distance_ratio * x_ratio;
+        y_cm_raw = -(double)((curr_deadwheel_encoder[1] - curr_deadwheel_encoder[0]) - (last_deadwheel_encoder[1] - last_deadwheel_encoder[0])) / 2 * distance_ratio * y_ratio;
+        double det_x = x_cm_raw - det_heading * forward_offset;
+        double det_y = y_cm_raw;
+
+        for(int i = 0; i < 3; i++){
+            last_deadwheel_encoder[i] = curr_deadwheel_encoder[i];
+        }
 
         //TODO Add @det_heading to below to see whether it will be better
         x_cm += Math.cos(heading - det_heading / 2) * det_x - Math.sin(heading - det_heading / 2) * det_y;
         y_cm += Math.sin(heading - det_heading / 2) * det_x + Math.cos(heading - det_heading / 2) * det_y;
-        last_x_cm_raw = x_cm_raw;
-        last_y_cm_raw = y_cm_raw;
+
         curr_pos.set(x_cm + start_pos.getX(), y_cm + start_pos.getY(), heading);
     }
 
@@ -260,7 +283,7 @@ public class Andrew {
         arm_motor.setPower(0.5);
     }
     public void arm_down(){
-        arm_motor.setTargetPosition(1200);
+        arm_motor.setTargetPosition(arm_down_pos);
         arm_motor.setPower(0.4);
     }
     public void arm_stop(){
@@ -299,8 +322,10 @@ public class Andrew {
     //shooter
 
     public void shooter_shoot(){
-        shoot_motor_1.setPower(shootPower);
-        shoot_motor_2.setPower(shootPower);
+//        shoot_motor_1.setPower(shootPower);
+//        shoot_motor_2.setPower(shootPower);
+        shoot_motor_1.setVelocity(shootVelocity, AngleUnit.DEGREES);
+        shoot_motor_2.setVelocity(shootVelocity, AngleUnit.DEGREES);
     }
     public void shooter_stop(){
         shoot_motor_1.setPower(0);
@@ -324,7 +349,7 @@ public class Andrew {
         shooter_shoot();
         load_up();
         double sec_bias = 0;
-        if(shoot_num == 0) sec_bias = 0.5;
+        if(shoot_num == 0) sec_bias = 1;
         if(sec_bias <= shoot_timer.seconds() &&shoot_timer.seconds() < shoot_duration / 2 + sec_bias)  fire_on();
         else if(shoot_timer.seconds() < shoot_duration+ sec_bias) fire_off();
         else {

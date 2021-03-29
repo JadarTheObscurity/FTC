@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.util.PID;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 import org.firstinspires.ftc.teamcode.util.TowerPipeline;
 import org.firstinspires.ftc.teamcode.util.Webcam;
-import org.opencv.core.Point;
 
 @TeleOp(group = "Johanson")
 @Config
@@ -23,9 +22,9 @@ public class JohansonDrive extends OpMode {
     public void init() {
         johanson = new Johanson(hardwareMap);
         johanson.setStartPose(new Pose2d(0, 0, 0));
-        webcam = new Webcam(hardwareMap, new Point(640, 480));
-        webcam.setPipeline(pipeline);
-        webcam.startStreaming(Johanson.dashboard);
+//        webcam = new Webcam(hardwareMap, new Point(640, 480));
+//        webcam.setPipeline(pipeline);
+//        webcam.startStreaming(Johanson.dashboard);
     }
 
     boolean want_to_suck = false,

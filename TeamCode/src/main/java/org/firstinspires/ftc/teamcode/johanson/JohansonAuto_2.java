@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 import org.firstinspires.ftc.teamcode.util.WayPoint;
 
-@Autonomous
+@Autonomous(group = "Johanson")
 @Disabled
 public class JohansonAuto_2 extends LinearOpMode {
     Johanson johanson;
@@ -27,14 +27,18 @@ public class JohansonAuto_2 extends LinearOpMode {
         shoot_three_ring();
 
         //put first wobble
-        moveTo(new WayPoint(-120, 20, Math.toRadians(-150)));
         johanson.arm_down();
+        moveTo(new WayPoint(-120, 10, Math.toRadians(-150)));
+        johanson.claw_release();
 
         //grab second wobble
         moveTo(new WayPoint(-75, -94, Math.toRadians(0)));
+        johanson.claw_grab();
+        sleep(400);
 
         //put second wobble
         moveTo(new WayPoint(-120, 10, Math.toRadians(-140)));
+        johanson.claw_release();
         johanson.arm_up();
 
         moveTo(new WayPoint(-130, -130, Math.toRadians(0)));

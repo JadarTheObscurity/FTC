@@ -25,7 +25,7 @@ public class JadarControl {
 
     public static double x_kp = 0.07;
     public static double y_kp = 0.07;
-    public static double r_kp = -0.05;
+    public static double r_kp = -0.03;
     public double time_mult = 1;
 
     public double x_target = 0;
