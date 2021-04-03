@@ -24,7 +24,7 @@ public class Webcam_Tower_Blue extends OpMode {
     @Override
     public void init() {
         dashboard = FtcDashboard.getInstance();
-        webcam = new Webcam(hardwareMap, new Point(640, 480));
+        webcam = new Webcam(hardwareMap, "Webcam Tower", new Point(640, 480));
         webcam.setPipeline(pipeline);
         webcam.startStreaming(dashboard);
     }

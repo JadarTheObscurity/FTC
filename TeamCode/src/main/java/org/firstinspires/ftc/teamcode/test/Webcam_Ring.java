@@ -22,12 +22,12 @@ public class Webcam_Ring extends OpMode {
 
     public static int pipline_stage = 0;
 
-    public static HSV_threshold threshold = new HSV_threshold(0, 180, 0, 255, 0, 255);
+    public static HSV_threshold threshold = RingPipeline.threshold.copy();
 
     @Override
     public void init() {
         dashboard = FtcDashboard.getInstance();
-        webcam = new Webcam(hardwareMap, new Point(640, 480));
+        webcam = new Webcam(hardwareMap, "Webcam Ring", new Point(640, 480));
         webcam.setPipeline(pipeline);
         webcam.startStreaming(dashboard);
     }
@@ -35,6 +35,7 @@ public class Webcam_Ring extends OpMode {
     @Override
     public void loop() {
         packet.put("white pixel number", pipeline.white_pixel);
+        packet.put("Ring Status", pipeline.ringStatus);
         dashboard.sendTelemetryPacket(packet);
         RingPipeline.curr_stage = pipline_stage;
         pipeline.setHSVThreshold(threshold);

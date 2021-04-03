@@ -14,9 +14,9 @@ public class Webcam {
     OpenCvCamera webcam;
     boolean isStreaming = false;
     public Point resolution;
-    public Webcam(HardwareMap hardwareMap, Point resolution){
+    public Webcam(HardwareMap hardwareMap, String name, Point resolution){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, name), cameraMonitorViewId);
         this.resolution = resolution;
     }
 
@@ -30,14 +30,13 @@ public class Webcam {
 
     public void startStreaming(FtcDashboard dashboard){
         if(!isStreaming) {
-            dashboard.startCameraStream(webcam, 30);
             webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
                 @Override
                 public void onOpened() {
                     webcam.startStreaming((int) resolution.x, (int) resolution.y, OpenCvCameraRotation.UPRIGHT);
                 }
             });
-
+            dashboard.startCameraStream(webcam, 30);
             isStreaming = true;
         }
     }

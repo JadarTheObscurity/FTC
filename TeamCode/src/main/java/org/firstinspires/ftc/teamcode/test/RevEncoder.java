@@ -24,25 +24,38 @@ public class RevEncoder extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        lf = hardwareMap.get(DcMotorEx.class, "lf");
-        lb = hardwareMap.get(DcMotorEx.class, "lb");
-        rf = hardwareMap.get(DcMotorEx.class, "rf");
-        rb = hardwareMap.get(DcMotorEx.class, "rb");
-        m_ly = hardwareMap.get(DcMotorEx.class, "lf");
-        m_ry = hardwareMap.get(DcMotorEx.class, "lb");
-        m_x = hardwareMap.get(DcMotorEx.class, "rf");
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        dashboard = FtcDashboard.getInstance();
-        imu = new IMU(hardwareMap);
+//        lf = hardwareMap.get(DcMotorEx.class, "lf");
+//        lb = hardwareMap.get(DcMotorEx.class, "lb");
+//        rf = hardwareMap.get(DcMotorEx.class, "rf");
+//        rb = hardwareMap.get(DcMotorEx.class, "rb");
+//        m_ly = hardwareMap.get(DcMotorEx.class, "lf");
+//        m_ry = hardwareMap.get(DcMotorEx.class, "lb");
+//        m_x = hardwareMap.get(DcMotorEx.class, "rf");
+//        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        dashboard = FtcDashboard.getInstance();
+//        imu = new IMU(hardwareMap);
+//        waitForStart();
+//        drive();
+
+        m_ly = hardwareMap.get(DcMotorEx.class, "ly");
+        m_ry = hardwareMap.get(DcMotorEx.class, "ry");
+        m_ly.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_ly.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        m_ry.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_ry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
-        drive();
+        while(opModeIsActive()){
+            telemetry.addData("ly", m_ly.getCurrentPosition());
+            telemetry.addData("ry", m_ry.getCurrentPosition());
+            telemetry.update();
+        }
     }
 
     void drive(){

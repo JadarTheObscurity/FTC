@@ -29,7 +29,7 @@ public class AndrewDrive extends OpMode {
         greenLED = hardwareMap.get(DigitalChannel.class, "green");
         redLED.setMode(DigitalChannel.Mode.OUTPUT);
         greenLED.setMode(DigitalChannel.Mode.OUTPUT);
-        webcam = new Webcam(hardwareMap, new Point(640, 480));
+        webcam = new Webcam(hardwareMap, "Webcam Tower", new Point(640, 480));
         webcam.setPipeline(pipeline);
         webcam.startStreaming(Andrew.dashboard);
     }
@@ -98,11 +98,8 @@ public class AndrewDrive extends OpMode {
         if(want_to_grab) andrew.claw_grab();
         else andrew.claw_release();
 
-        andrew.put_packet("shoot1", Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES));
-        andrew.put_packet("shoot2", Andrew.shoot_motor_2.getVelocity(AngleUnit.DEGREES));
-        andrew.update();
 
-        if(Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES) < -18000){
+        if(Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES) < andrew.shootVelocity + 500){
             redLED.setState(false);
             greenLED.setState(true);
         }
@@ -113,6 +110,13 @@ public class AndrewDrive extends OpMode {
 //
         if(gamepad1.dpad_up) andrew.arm_up();
         if(gamepad1.dpad_down) andrew.arm_down();
+
+        telemetry.addData("shoot1", Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("shoot2", Andrew.shoot_motor_2.getVelocity(AngleUnit.DEGREES));
+        telemetry.update();
+        andrew.put_packet("shoot1", Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES));
+        andrew.put_packet("shoot2", Andrew.shoot_motor_2.getVelocity(AngleUnit.DEGREES));
+        andrew.update();
     }
 
     @Override

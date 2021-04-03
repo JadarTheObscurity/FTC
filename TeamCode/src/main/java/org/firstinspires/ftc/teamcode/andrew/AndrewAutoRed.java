@@ -15,9 +15,17 @@ public class AndrewAutoRed extends LinearOpMode {
         andrew.setStartPose(new Pose2d(150, -157, 0));
         andrew.claw_grab();
         waitForStart();
-        state_A();
+        test_move();
         andrew.finish();
     }
+
+    void test_move(){
+        andrew.setStartPose(new Pose2d(0, 0, 0));
+        moveTo(new WayPoint(180, 180, Math.toRadians(0)));
+        sleep(3000);
+        moveTo(new WayPoint(0, 0, 0));
+    }
+
 
     void state_A(){
         //Shoot

@@ -22,8 +22,8 @@ public class MecanumDriveTrain {
     public final double y_pv_ratio = 250;
 
     public static double
-            max_v = 40,
-            max_a = 20,
+            max_v = 70,
+            max_a = 25,
             max_w = 40,
             max_alpha = 20;
 
