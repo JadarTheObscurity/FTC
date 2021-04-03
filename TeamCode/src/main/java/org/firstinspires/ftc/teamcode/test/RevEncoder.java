@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.test;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.util.MyMath;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 
 @TeleOp
+@Disabled
 public class RevEncoder extends LinearOpMode {
     DcMotorEx m_ly, m_ry, m_x;
     DcMotorEx lf, lb, rf, rb;

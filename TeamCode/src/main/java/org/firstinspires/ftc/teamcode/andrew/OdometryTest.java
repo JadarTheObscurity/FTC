@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.andrew;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.IMU;
 
 @TeleOp(group = "Andrew")
+@Disabled
 public class OdometryTest extends OpMode {
     Andrew andrew;
     IMU imu;

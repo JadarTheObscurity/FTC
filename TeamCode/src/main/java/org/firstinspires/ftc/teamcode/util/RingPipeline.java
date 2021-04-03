@@ -26,13 +26,13 @@ public class RingPipeline extends OpenCvPipeline {
     public static HSV_threshold threshold = new HSV_threshold(10, 30, 0, 255, 150, 255);
 
     public RingStatus ringStatus = RingStatus.NONE;
-    int threshold_1 = 400;
-    int threshold_2 = 2000;
+    int threshold_1 = 300;
+    int threshold_2 = 1700;
 
     public int white_pixel = 0;
 
-    Point pointA = new Point(1 * show_resolution.x / 8, 5 * show_resolution.y/8);
-    Point pointB = new Point(7 * show_resolution.x / 8, 7 * show_resolution.y/8);
+    Point pointA = new Point(1 * show_resolution.x / 8, 3.5 * show_resolution.y/8);
+    Point pointB = new Point(7 * show_resolution.x / 8, 6 * show_resolution.y/8);
 
     public enum RingStatus {
         NONE,

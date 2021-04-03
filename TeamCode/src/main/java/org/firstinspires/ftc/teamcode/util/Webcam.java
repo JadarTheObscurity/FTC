@@ -41,6 +41,11 @@ public class Webcam {
         }
     }
 
+    public void force_opne(){
+        webcam.openCameraDevice();
+        webcam.openCameraDevice();
+    }
+
     public void stopStreaming(){
         if(isStreaming) {
             webcam.stopStreaming();
