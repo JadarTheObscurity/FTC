@@ -50,17 +50,19 @@ public class Andrew {
 
 
 //    final double shootPower = -1;
-    public final double shootVelocity = -19400;
-    final double suckPower = 0.8;
+    public final double shootTowerVelocity = -19500;
+    public final double shootShotVelocity = -17000;
+    final double suckPower = 0.7;
     final double reversesuckPower = -0.7;
     final double plateState_collect = 0.09;
+    final double plateState_half = 0.2;
     final double plateState_lift = 0.30;
     final double pushState_wait = 0;
     final double pushState_push = 0.5;
     final double armState_up=0;
-    final int arm_down_pos=-1650;
-    final double clawState_loose = 1; //0.8
-    final double clawState_catch = 0.5;//0.3
+    final int arm_down_pos=-1750;
+    final double clawState_loose = 0.5; //0.8
+    final double clawState_catch = 0;//0.3
     final double shoot_duration = 0.5;
 
     public Andrew(HardwareMap hardwareMap) {
@@ -326,11 +328,17 @@ public class Andrew {
     }
     //shooter
 
-    public void shooter_shoot(){
+    public void shooter_shoot_tower(){
 //        shoot_motor_1.setPower(shootPower);
 //        shoot_motor_2.setPower(shootPower);
-        shoot_motor_1.setVelocity(shootVelocity, AngleUnit.DEGREES);
-        shoot_motor_2.setVelocity(shootVelocity, AngleUnit.DEGREES);
+        shoot_motor_1.setVelocity(shootTowerVelocity, AngleUnit.DEGREES);
+        shoot_motor_2.setVelocity(shootTowerVelocity, AngleUnit.DEGREES);
+    }
+    public void shooter_shoot_shot(){
+//        shoot_motor_1.setPower(shootPower);
+//        shoot_motor_2.setPower(shootPower);
+        shoot_motor_1.setVelocity(shootShotVelocity, AngleUnit.DEGREES);
+        shoot_motor_2.setVelocity(shootShotVelocity, AngleUnit.DEGREES);
     }
     public void shooter_stop(){
         shoot_motor_1.setPower(0);
@@ -340,6 +348,10 @@ public class Andrew {
     public void load_up(){
         load_servo_l.setPosition(plateState_lift);
         load_servo_r.setPosition(plateState_lift);
+    }
+    public void load_half(){
+        load_servo_l.setPosition(plateState_half);
+        load_servo_r.setPosition(plateState_half);
     }
     public void load_down(){
         load_servo_l.setPosition(plateState_collect);
@@ -351,7 +363,7 @@ public class Andrew {
 
     int shoot_num = 0;
     public boolean shoot_3_ring(){
-        shooter_shoot();
+        shooter_shoot_tower();
         load_up();
         double sec_bias = 0;
         if(shoot_num == 0) sec_bias = 1;
@@ -365,7 +377,7 @@ public class Andrew {
     }
 
     public boolean shoot_ring(int num, boolean pre_spin){
-        shooter_shoot();
+        shooter_shoot_tower();
         load_up();
         double sec_bias = 0;
         if(shoot_num == 0 && pre_spin) sec_bias = 1;
@@ -380,7 +392,7 @@ public class Andrew {
     }
 
     public boolean shoot_1_ring(){
-        shooter_shoot();
+        shooter_shoot_tower();
         load_up();
         if(shoot_timer.seconds() < shoot_duration / 2)  fire_on();
         else if(shoot_timer.seconds() < shoot_duration) fire_off();

@@ -35,9 +35,12 @@ public class TowerPipeline extends OpenCvPipeline {
         switch (tower){
             case Blue:
                 curr_hsv = blue_hsv;
+                this.tower = Tower.Blue;
                 break;
             case Red:
                 curr_hsv = red_hsv;
+                this.tower = Tower.Red;
+                break;
         }
     }
 
@@ -46,8 +49,10 @@ public class TowerPipeline extends OpenCvPipeline {
         Red
     }
 
-    public static HSV_threshold blue_hsv = new HSV_threshold(90, 120, 30, 255, 170, 255);
-    public static HSV_threshold red_hsv = new HSV_threshold(0, 10, 30, 255, 170, 255);
+    Tower tower = Tower.Blue;
+
+    public static HSV_threshold blue_hsv = new HSV_threshold(90, 120, 50, 255, 170, 255);
+    public static HSV_threshold red_hsv = new HSV_threshold(115, 125, 50, 255, 170, 255);
     public static HSV_threshold white_hsv = new HSV_threshold(0, 180, 0, 30, 200, 255);
 
     HSV_threshold curr_hsv;
@@ -229,7 +234,15 @@ public class TowerPipeline extends OpenCvPipeline {
     }
 
     void createColorMask(Mat src, Mat dst){
-        Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
+        //Use Different mapping to avoid red at both side of spectrum
+        switch (tower){
+            case Blue:
+                Imgproc.cvtColor(src, dst, Imgproc.COLOR_RGB2HSV);
+                break;
+            case Red:
+                Imgproc.cvtColor(src, dst, Imgproc.COLOR_BGR2HSV);
+                break;
+        }
         Core.inRange(dst,curr_hsv.min(), curr_hsv.max(), dst);
     }
 

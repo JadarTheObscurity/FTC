@@ -23,11 +23,11 @@ public class RingPipeline extends OpenCvPipeline {
     Mat thresh_region = new Mat();
     Mat ROI = new Mat();
     Mat proc_Mat = new Mat();
-    public static HSV_threshold threshold = new HSV_threshold(10, 30, 0, 255, 150, 255);
+    public static HSV_threshold threshold = new HSV_threshold(10, 30, 0, 255, 100, 255);
 
     public RingStatus ringStatus = RingStatus.NONE;
-    int threshold_1 = 300;
-    int threshold_2 = 1700;
+    int threshold_1 = 700;
+    int threshold_2 = 2000;
 
     public int white_pixel = 0;
 

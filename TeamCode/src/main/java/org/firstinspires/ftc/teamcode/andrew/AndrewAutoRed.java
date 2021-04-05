@@ -34,8 +34,6 @@ public class AndrewAutoRed extends LinearOpMode {
         telemetry.addData("White Pixel Num", pipeline.white_pixel);
         telemetry.update();
 
-        ringStatus = RingPipeline.RingStatus.NONE;
-
         switch (ringStatus){
             case NONE:
                 state_A();
@@ -59,7 +57,8 @@ public class AndrewAutoRed extends LinearOpMode {
     }
 
     void go_home(){
-        moveTo(new WayPoint(107, -140, Math.toRadians(0)));
+//        moveTo(new WayPoint(107, -140, Math.toRadians(0))); // Home
+        moveTo(new WayPoint(90, 20, Math.toRadians(0))); //White Line
     }
 
     void state_A(){
@@ -95,34 +94,33 @@ public class AndrewAutoRed extends LinearOpMode {
         drop_intake();
 
         //Shoot
-        andrew.shooter_shoot();
-        moveTo(new WayPoint(107, -100, Math.toRadians(-6)));
-        moveTo(new WayPoint(88, -97, Math.toRadians(-6)));
-        shoot_ring(3, true);
+//        moveTo(new WayPoint(107, -100, Math.toRadians(-6)));
+        moveTo(new WayPoint(85, -97, Math.toRadians(-6), 2));
+        shoot_ring(2, true);
 
 
         //Shoot 2
         andrew.suck_spin();
-        moveTo(new WayPoint(88, -75, Math.toRadians(-5), 2.3));
+        moveTo(new WayPoint(85, -20, Math.toRadians(-5), 3));
         andrew.suck_spin();
-        andrew.shooter_shoot();
-        sleep(500);
-        shoot_ring(2, false);
+        andrew.shooter_shoot_tower();
+        sleep(800);
+        shoot_ring(3, false);
         andrew.stop_all();
 
         //put first wobble
         andrew.arm_down();
-        moveTo(new WayPoint(130, 65, Math.toRadians(-180)));
+        moveTo(new WayPoint(115, 65, Math.toRadians(-180)));
         andrew.claw_release();
 
         //grab second wobble
-        moveTo(new WayPoint(55, -70, Math.toRadians(0)));
-        moveTo(new WayPoint(55, -87, Math.toRadians(0)));
+        moveTo(new WayPoint(52, -70, Math.toRadians(0)));
+        moveTo(new WayPoint(52, -87, Math.toRadians(0)));
         andrew.claw_grab();
         sleep(300);
 
         //put second wobble
-        moveTo(new WayPoint(110, 50, Math.toRadians(-180)));
+        moveTo(new WayPoint(120, 50, Math.toRadians(-180)));
         andrew.claw_release();
         andrew.arm_up();
 
@@ -134,26 +132,25 @@ public class AndrewAutoRed extends LinearOpMode {
         //Put down yeh
         drop_intake();
         //Shoot
-        andrew.shooter_shoot();
 //        moveTo(new WayPoint(107, -110, Math.toRadians(-6)));
-        moveTo(new WayPoint(88, -100, Math.toRadians(-6)));
+        moveTo(new WayPoint(92, -100, Math.toRadians(-3.5), 1));
         shoot_ring(3, true);
 
 
         //Shoot 2
         andrew.suck_spin();
-        moveTo(new WayPoint(88, -75, Math.toRadians(-5), 2.3));
+        moveTo(new WayPoint(92, -75, Math.toRadians(-3), 1.7));
         andrew.suck_spin();
-        andrew.shooter_shoot();
-        sleep(500);
+        andrew.shooter_shoot_tower();
+        sleep(800);
         shoot_ring(2, false);
         andrew.stop_all();
 
         andrew.suck_spin();
-        moveTo(new WayPoint(88, -40, Math.toRadians(-4), 1.5));
+        moveTo(new WayPoint(91, -20, Math.toRadians(-3), 3));
         andrew.suck_spin();
-        andrew.shooter_shoot();
-        sleep(500);
+        andrew.shooter_shoot_tower();
+        sleep(800);
         andrew.suck_reverse(0.2);
         shoot_ring(2, false);
         andrew.shooter_stop();
@@ -162,18 +159,18 @@ public class AndrewAutoRed extends LinearOpMode {
 
         //put first wobble
         andrew.arm_down();
-        moveTo(new WayPoint(100, 150, Math.toRadians(90)));
+        moveTo(new WayPoint(100, 160, Math.toRadians(90)));
         andrew.claw_release();
 
-        //grab second wobble
-        moveTo(new WayPoint(50, -70, Math.toRadians(0)));
+        //grab second wobble;
+        moveTo(new WayPoint(50, -65, Math.toRadians(0)));
         moveTo(new WayPoint(50, -87, Math.toRadians(0)));
         andrew.claw_grab();
         sleep(500);
 
         //put second wobble
-        moveTo(new WayPoint(100, 140, Math.toRadians(90)));
-        moveTo(new WayPoint(100, 140, Math.toRadians(90)));
+        moveTo(new WayPoint(90, 150, Math.toRadians(90)));
+        moveTo(new WayPoint(90, 150, Math.toRadians(90)));
         andrew.claw_release();
         andrew.arm_up();
 
