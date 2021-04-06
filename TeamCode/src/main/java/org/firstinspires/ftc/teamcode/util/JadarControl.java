@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -9,7 +10,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 
-
+@Config
 public class JadarControl {
     MecanumDriveTrain driveTrain;
     ElapsedTime timer = new ElapsedTime();
@@ -20,12 +21,14 @@ public class JadarControl {
     }
 
     public void reset(){
+        r_pid.reest();
         timer.reset();
     }
 
     public static double x_kp = 0.07;
     public static double y_kp = 0.07;
-    public static double r_kp = -0.03;
+    public static double r_kp = -0.07;
+    public static PID r_pid = new PID(-0.07, -0.00005, 0);
     public double time_mult = 1;
 
     public double x_target = 0;
@@ -241,20 +244,22 @@ public class JadarControl {
         double robot_vy_target = -vx_target * Math.sin(curr.getR()) + vy_target * Math.cos(curr.getR());
 
         //P control
-//        double x_power = Range.clip(robot_vx_target / driveTrain.x_pv_ratio + robot_x_error * x_kp, -power_limit_x, power_limit_x);
-//        double y_power = Range.clip(robot_vy_target / driveTrain.y_pv_ratio + robot_y_error * y_kp, -power_limit_x, power_limit_x);
-        double x_power = Range.clip(robot_x_error * x_kp, -power_limit_x, power_limit_x);
-        double y_power = Range.clip( robot_y_error * y_kp, -power_limit_y, power_limit_y);
-        double r_power = Range.clip(r_error * r_kp, -power_limit_r, power_limit_r);
+        double x_power = Range.clip(robot_vx_target / driveTrain.x_pv_ratio + robot_x_error * x_kp, -power_limit_x, power_limit_x);
+        double y_power = Range.clip(robot_vy_target / driveTrain.y_pv_ratio + robot_y_error * y_kp, -power_limit_x, power_limit_x);
+//        double x_power = Range.clip(robot_x_error * x_kp, -power_limit_x, power_limit_x);
+//        double y_power = Range.clip( robot_y_error * y_kp, -power_limit_y, power_limit_y);
+//        double r_power = Range.clip(r_error * r_kp, -power_limit_r, power_limit_r);
+        double r_power = Range.clip(r_pid.result(r_error, 0), -power_limit_r, power_limit_r);
+
 
 
 
         // add extra 0.1 second to yeah you know what I mean
         boolean times_up = timer.seconds() > total_time + 0.1;
         // position and time out
-        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 3 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 0.5;
+        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 3 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 10;
 
-        if(times_up || to_destine){
+        if(times_up && to_destine){
             driveTrain.move(0, 0, 0);
             return true;
         }

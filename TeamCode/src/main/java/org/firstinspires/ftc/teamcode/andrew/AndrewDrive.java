@@ -4,6 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.PID;
@@ -19,6 +22,7 @@ public class AndrewDrive extends OpMode {
     TowerPipeline pipeline = new TowerPipeline(TowerPipeline.Tower.Red);
     Andrew andrew;
     PID tower_pid = new PID(-0.5, 0,1 );
+    NormalizedColorSensor colorSensor;
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
     @Override
@@ -32,6 +36,8 @@ public class AndrewDrive extends OpMode {
         webcam = new Webcam(hardwareMap, "Webcam Tower", new Point(640, 480));
         webcam.setPipeline(pipeline);
         webcam.startStreaming(Andrew.dashboard);
+
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color");
     }
 
     boolean want_to_suck = false,
@@ -45,6 +51,9 @@ public class AndrewDrive extends OpMode {
     last_right_bumper = false,
     last_left_trigger = false,
     last_y = false;
+
+    boolean detect_3_ring = false, force_suck = false;
+    ElapsedTime color_timer = new ElapsedTime();
 
     public static double kp = -1;
     public static double ki = 0;
@@ -62,7 +71,7 @@ public class AndrewDrive extends OpMode {
             driveTrain_y *= 0.3;
         }
         else{
-            driveTrain_rotate *= 0.9;
+            driveTrain_rotate *= (1 - 0.7 * gamepad1.right_trigger);
         }
 
         if(gamepad1.a && pipeline.found){
@@ -78,6 +87,10 @@ public class AndrewDrive extends OpMode {
 
         if(gamepad1.x && !last_x) {
             want_to_suck = !want_to_suck;
+
+            if(detect_3_ring) force_suck = true;
+            if(!want_to_suck) force_suck = false;
+
             if(want_to_suck) {
                 want_to_shoot_tower = false;
                 want_to_shoot_shot = false;
@@ -87,7 +100,10 @@ public class AndrewDrive extends OpMode {
         if(gamepad1.left_bumper && !last_left_bumper) {
             want_to_shoot_tower = !want_to_shoot_tower;
             want_to_shoot_shot = false;
-            if(want_to_shoot_tower) want_to_suck = false;
+            if(want_to_shoot_tower) {
+                want_to_suck = false;
+                force_suck = false;
+            }
         }
         if(gamepad1.left_trigger > 0.5 && !last_left_trigger) {
             want_to_shoot_shot = !want_to_shoot_shot;
@@ -104,6 +120,13 @@ public class AndrewDrive extends OpMode {
 
         if(andrew.shoot_timer.seconds() < andrew.shoot_duration/2) want_to_fire = true;
         else want_to_fire = false;
+
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        detect_3_ring = colors.red > 0.0015;
+        if(!detect_3_ring) color_timer.reset();
+        if(color_timer.seconds() > 0.5 && !force_suck) want_to_suck = false;
+
+        ///////////////////////////////////////////////////////////////////////////
 
         if(want_to_shoot_shot){
             andrew.shooter_shoot_shot();
@@ -153,6 +176,7 @@ public class AndrewDrive extends OpMode {
 
         telemetry.addData("shoot1", Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES));
         telemetry.addData("shoot2", Andrew.shoot_motor_2.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("color red", colors.red);
         telemetry.update();
         andrew.put_packet("shoot1", Andrew.shoot_motor_1.getVelocity(AngleUnit.DEGREES));
         andrew.put_packet("shoot2", Andrew.shoot_motor_2.getVelocity(AngleUnit.DEGREES));

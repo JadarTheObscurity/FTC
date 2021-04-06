@@ -73,6 +73,10 @@ public class Andrew {
         packet = new TelemetryPacket();
     }
 
+    void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior){
+        driveTrain.setZeroPowerBehavior(behavior);
+    }
+
     void setUpHardware(HardwareMap hardwareMap){
         driveTrain = new MecanumDriveTrain(hardwareMap, false);
         control = new JadarControl(driveTrain);
@@ -230,9 +234,9 @@ public class Andrew {
     static double encoder_cpr = 8192;
     static double cpr_to_rad = 2 * Math.PI / encoder_cpr;
     static double distance_ratio = dead_wheel_diameter / 2 * cpr_to_rad;
-    static double spin_ratio = -0.9982e-4 * 1.024;//dead_wheel_diameter / lateral_distance * cpr_to_rad;
-    public static double y_ratio = 312.0/308;
-    public static double x_ratio = 163.0/153 * 182 / 184;
+    static double spin_ratio = -0.9982e-4 * 3600.0 / 3459;//dead_wheel_diameter / lateral_distance * cpr_to_rad;
+    public static double y_ratio = 280.0 / 286.5;
+    public static double x_ratio = 1;
     public static double[] curr_deadwheel_encoder = {0, 0, 0};
     public static double[] last_deadwheel_encoder = {0, 0, 0};
 
@@ -255,7 +259,18 @@ public class Andrew {
             last_deadwheel_encoder[i] = curr_deadwheel_encoder[i];
         }
 
-        det_heading = 0;
+        //Curve part
+        if(det_heading != 0){
+            double tem_x = det_x;
+            double tem_y = det_y;
+
+            double sin = Math.sin(det_heading) / det_heading;
+            double cos = (1 - Math.cos(det_heading)) / det_heading;
+
+            det_x = tem_x * sin - tem_y * cos;
+            det_y = tem_x * cos + tem_y * sin;
+        }
+
         x_cm += Math.cos(heading - det_heading / 2) * det_x - Math.sin(heading - det_heading / 2) * det_y;
         y_cm += Math.sin(heading - det_heading / 2) * det_x + Math.cos(heading - det_heading / 2) * det_y;
 

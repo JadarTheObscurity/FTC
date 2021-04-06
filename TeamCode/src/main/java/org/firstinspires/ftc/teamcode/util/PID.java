@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.util;
 
 public class PID {
-    double kp = 0;
-    double ki = 0;
-    double kd = 0;
+    public double kp = 0;
+    public double ki = 0;
+    public double kd = 0;
     double last_input = 0;
     double error_sum = 0;
 
