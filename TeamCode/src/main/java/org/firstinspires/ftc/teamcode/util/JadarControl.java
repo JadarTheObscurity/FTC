@@ -25,7 +25,7 @@ public class JadarControl {
         timer.reset();
     }
 
-    public static double x_kp = 0.07;
+    public static double x_kp = 0.1;
     public static double y_kp = 0.07;
     public static double r_kp = -0.07;
     public static PID r_pid = new PID(-0.07, -0.00005, 0);
@@ -255,9 +255,9 @@ public class JadarControl {
 
 
         // add extra 0.1 second to yeah you know what I mean
-        boolean times_up = timer.seconds() > total_time + 0.1;
+        boolean times_up = timer.seconds() > total_time;
         // position and time out
-        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 3 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 10;
+        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 2 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 0.3;
 
         if(times_up && to_destine){
             driveTrain.move(0, 0, 0);

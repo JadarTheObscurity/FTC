@@ -51,13 +51,13 @@ public class AndrewAutoBlue extends LinearOpMode {
 
     void drop_intake(){
 
-        moveTo(new WayPoint(-106, -145, 0, 0.2));
+        moveTo(new WayPoint(-106, -150, 0, 0.2));
         moveTo(new WayPoint(-106, -160, 0, 0.2));
     }
 
     void go_home(){
-//        moveTo(new WayPoint(-107, -140, Math.toRadians(0))); //Home
-        moveTo(new WayPoint(-90, 20, Math.toRadians(0))); //White Line
+        moveTo(new WayPoint(-107, -155, Math.toRadians(0))); //Home
+//        moveTo(new WayPoint(-90, 20, Math.toRadians(0))); //White Line
     }
 
     void state_A(){
@@ -65,28 +65,28 @@ public class AndrewAutoBlue extends LinearOpMode {
         //Put down yeh
         drop_intake();
         //Shoot
-        moveTo(new WayPoint(-95, -20, Math.toRadians(-3)));
+        moveTo(new WayPoint(-85, -30, Math.toRadians(-3)));
         shoot_ring(3, true);
         andrew.shooter_stop();
 
         //put first wobble
-        andrew.arm_down();
-        moveTo(new WayPoint(-120, 60, Math.toRadians(-90)));
-        andrew.claw_release();
-
+        andrew.arm_half_down();
+        moveTo(new WayPoint(-115, 55, Math.toRadians(-90)));
+        put_down_wobble();
         //grab second wobble
-        moveTo(new WayPoint(-70, -70, Math.toRadians(0)));
-        moveTo(new WayPoint(-70, -85, Math.toRadians(0)));
+        andrew.arm_down();
+        moveTo(new WayPoint(-80, -80, Math.toRadians(0)));
+        moveTo(new WayPoint(-80, -93, Math.toRadians(0)));
         andrew.claw_grab();
         sleep(300);
+        andrew.arm_half_down();
 
         //put second wobble
-        moveTo(new WayPoint(-115, 40, Math.toRadians(-90)));
-        andrew.claw_release();
-        sleep(200);
+        moveTo(new WayPoint(-110, 35, Math.toRadians(-90)));
+        put_down_wobble();
         andrew.arm_up();
 
-        moveTo(new WayPoint(-110, 40, Math.toRadians(-90)));
+        moveTo(new WayPoint(-90, 40, Math.toRadians(-90)));
 
         go_home();
     }
@@ -96,36 +96,38 @@ public class AndrewAutoBlue extends LinearOpMode {
         drop_intake();
 
         //Shoot
-        andrew.shooter_shoot_tower();
-        moveTo(new WayPoint(-92, -97, Math.toRadians(-3)));
-        shoot_ring(3, true);
+        moveTo(new WayPoint(-95, -97, Math.toRadians(-5)), false);
+        shoot_ring_far(1, true);
 
 
         //Shoot 2
         andrew.suck_spin();
-        moveTo(new WayPoint(-95, -20, Math.toRadians(-4), 3));
+        moveTo(new WayPoint(-88, -30, Math.toRadians(-4), 3));
         andrew.suck_spin();
         andrew.shooter_shoot_tower();
         sleep(800);
-        shoot_ring(2, false);
+        andrew.suck_stop();
+        sleep(200);
+        shoot_ring(3, false);
         andrew.stop_all();
 
         //put first wobble
-        andrew.arm_down();
-        moveTo(new WayPoint(-85, 65, Math.toRadians(-180)));
-        andrew.claw_release();
+        andrew.arm_half_down();
+        moveTo(new WayPoint(-85, 60, Math.toRadians(-180)));
+        put_down_wobble();
 
         //grab second wobble
-        moveTo(new WayPoint(-70, -70, Math.toRadians(0)));
-        moveTo(new WayPoint(-70, -87, Math.toRadians(0)));
+        andrew.arm_down();
+        moveTo(new WayPoint(-80, -80, Math.toRadians(0)));
+        moveTo(new WayPoint(-80, -93, Math.toRadians(0)));
         andrew.claw_grab();
-        sleep(300);
+        sleep(500);
+        andrew.arm_half_down();
 
         //put second wobble
-        moveTo(new WayPoint(-80, 50, Math.toRadians(-180)));
-        andrew.claw_release();
+        moveTo(new WayPoint(-80, 35, Math.toRadians(-180)));
+        put_down_wobble();
         andrew.arm_up();
-
         go_home();
     }
 
@@ -134,12 +136,14 @@ public class AndrewAutoBlue extends LinearOpMode {
         //Put down yeh
         drop_intake();
         //Shoot
-        moveTo(new WayPoint(-92, -97, Math.toRadians(-2)));
-        shoot_ring(3, true);
+        andrew.shooter_shoot_tower();
+        andrew.load_up();
+        moveTo(new WayPoint(-95, -97, Math.toRadians(-7)), false);
+        shoot_ring_far(3, false);
 
         //Shoot 2
         andrew.suck_spin();
-        moveTo(new WayPoint(-92, -72, Math.toRadians(-4), 2));
+        moveTo(new WayPoint(-90, -72, Math.toRadians(-5), 2));
         andrew.suck_spin();
         andrew.shooter_shoot_tower();
         sleep(800);
@@ -147,40 +151,51 @@ public class AndrewAutoBlue extends LinearOpMode {
         shoot_ring(2, false);
 
         andrew.suck_spin();
-        moveTo(new WayPoint(-92, -20, Math.toRadians(-3), 2));
+        moveTo(new WayPoint(-88, -30, Math.toRadians(-5), 1.5));
         andrew.suck_spin();
         andrew.shooter_shoot_tower();
-        sleep(800);
+        sleep(500);
         andrew.suck_stop();
-        shoot_ring(3, false);
+        shoot_ring(2, false);
         andrew.stop_all();
 
 
         //put first wobble
-        andrew.arm_down();
-        moveTo(new WayPoint(-120, 160, Math.toRadians(-100)));
-        andrew.claw_release();
+        andrew.arm_half_down();
+        moveTo(new WayPoint(-110, 135, Math.toRadians(-135)));
+        put_down_wobble();
 
         //grab second wobble
-        moveTo(new WayPoint(-71, -70, Math.toRadians(0)));
-        moveTo(new WayPoint(-71, -85, Math.toRadians(0)));
+        andrew.arm_down();
+        moveTo(new WayPoint(-80, -80, Math.toRadians(0), 4));
+        moveTo(new WayPoint(-80, -93, Math.toRadians(0)));
         andrew.claw_grab();
         sleep(500);
+        andrew.arm_half_down();
 
         //put second wobble
-        moveTo(new WayPoint(-100, 160, Math.toRadians(-100)));
-        andrew.claw_release();
+//        moveTo(new WayPoint(-80, 120, Math.toRadians(0), 2));
+        moveTo(new WayPoint(-120, 95, Math.toRadians(180)));
+        put_down_wobble();
         andrew.arm_up();
 
         go_home();
     }
 
     void moveTo(WayPoint target){
+        moveTo(target, true);
+    }
+
+    void moveTo(WayPoint target, boolean stop_all){
         andrew.reset_all();
         while(opModeIsActive() && !andrew.moveTo(target)){
             andrew.update();
         }
-        andrew.stop_all();
+
+        if(stop_all){
+            andrew.stop_all();
+        }
+
     }
 
 
@@ -192,5 +207,18 @@ public class AndrewAutoBlue extends LinearOpMode {
         andrew.load_down();
     }
 
+    void shoot_ring_far(int num, boolean pre_spin){
+        andrew.reset_all();
+        while(opModeIsActive() && !andrew.shoot_ring_far(num, pre_spin)){
 
+        }
+        andrew.load_down();
+    }
+
+    void put_down_wobble(){
+        andrew.arm_down();
+        sleep(300);
+        andrew.claw_release();
+        sleep(100);
+    }
 }

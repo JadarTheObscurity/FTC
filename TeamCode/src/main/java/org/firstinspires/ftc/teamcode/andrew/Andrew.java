@@ -50,6 +50,7 @@ public class Andrew {
 
 
 //    final double shootPower = -1;
+    public final double shootFarVelocity = -20000;
     public final double shootTowerVelocity = -19500;
     public final double shootShotVelocity = -17000;
     final double suckPower = 0.7;
@@ -61,9 +62,10 @@ public class Andrew {
     final double pushState_push = 0.5;
     final double armState_up=0;
     final int arm_down_pos=-1750;
+    final int arm_half_down_pos=-1500;
     final double clawState_loose = 0.5; //0.8
     final double clawState_catch = 0;//0.3
-    final double shoot_duration = 0.5;
+    final double shoot_duration = 0.7;
 
     public Andrew(HardwareMap hardwareMap) {
         setUpHardware(hardwareMap);
@@ -230,7 +232,7 @@ public class Andrew {
      */
     static double dead_wheel_diameter = 4.8;
     static double lateral_distance = 37;
-    static double forward_offset = 13.64;
+    static double forward_offset = 17.022;//13.64;
     static double encoder_cpr = 8192;
     static double cpr_to_rad = 2 * Math.PI / encoder_cpr;
     static double distance_ratio = dead_wheel_diameter / 2 * cpr_to_rad;
@@ -270,7 +272,6 @@ public class Andrew {
             det_x = tem_x * sin - tem_y * cos;
             det_y = tem_x * cos + tem_y * sin;
         }
-
         x_cm += Math.cos(heading - det_heading / 2) * det_x - Math.sin(heading - det_heading / 2) * det_y;
         y_cm += Math.sin(heading - det_heading / 2) * det_x + Math.cos(heading - det_heading / 2) * det_y;
 
@@ -298,11 +299,15 @@ public class Andrew {
 
     public void arm_up(){
         arm_motor.setTargetPosition(0);
-        arm_motor.setPower(0.5);
+        arm_motor.setPower(0.6);
     }
     public void arm_down(){
         arm_motor.setTargetPosition(arm_down_pos);
-        arm_motor.setPower(0.4);
+        arm_motor.setPower(0.6);
+    }
+    public void arm_half_down(){
+        arm_motor.setTargetPosition(arm_half_down_pos);
+        arm_motor.setPower(0.6);
     }
     public void arm_stop(){
         arm_motor.setPower(0);
@@ -344,14 +349,14 @@ public class Andrew {
     //shooter
 
     public void shooter_shoot_tower(){
-//        shoot_motor_1.setPower(shootPower);
-//        shoot_motor_2.setPower(shootPower);
+        shoot_motor_1.setVelocity(shootTowerVelocity, AngleUnit.DEGREES);
+        shoot_motor_2.setVelocity(shootTowerVelocity, AngleUnit.DEGREES);
+    }
+    public void shooter_shoot_far(){
         shoot_motor_1.setVelocity(shootTowerVelocity, AngleUnit.DEGREES);
         shoot_motor_2.setVelocity(shootTowerVelocity, AngleUnit.DEGREES);
     }
     public void shooter_shoot_shot(){
-//        shoot_motor_1.setPower(shootPower);
-//        shoot_motor_2.setPower(shootPower);
         shoot_motor_1.setVelocity(shootShotVelocity, AngleUnit.DEGREES);
         shoot_motor_2.setVelocity(shootShotVelocity, AngleUnit.DEGREES);
     }
@@ -377,20 +382,6 @@ public class Andrew {
     public void fire_off(){push_servo.setPosition(pushState_wait);}
 
     int shoot_num = 0;
-    public boolean shoot_3_ring(){
-        shooter_shoot_tower();
-        load_up();
-        double sec_bias = 0;
-        if(shoot_num == 0) sec_bias = 1;
-        if(sec_bias <= shoot_timer.seconds() &&shoot_timer.seconds() < shoot_duration / 2 + sec_bias)  fire_on();
-        else if(shoot_timer.seconds() < shoot_duration+ sec_bias) fire_off();
-        else {
-            shoot_timer.reset();
-            shoot_num++;
-        }
-        return shoot_num >= 3;
-    }
-
     public boolean shoot_ring(int num, boolean pre_spin){
         shooter_shoot_tower();
         load_up();
@@ -406,14 +397,20 @@ public class Andrew {
         return shoot_num >= num;
     }
 
-    public boolean shoot_1_ring(){
+    public boolean shoot_ring_far(int num, boolean pre_spin){
         shooter_shoot_tower();
         load_up();
-        if(shoot_timer.seconds() < shoot_duration / 2)  fire_on();
-        else if(shoot_timer.seconds() < shoot_duration) fire_off();
-
-        if(shoot_timer.seconds() < shoot_duration) return false;
-        return true;
+        double sec_bias = 0;
+        if(shoot_num == 0 && pre_spin) sec_bias = 1;
+        else sec_bias = 0.35;
+        if(sec_bias <= shoot_timer.seconds() &&shoot_timer.seconds() < shoot_duration / 2 + sec_bias)  fire_on();
+        else if(shoot_timer.seconds() < shoot_duration+ sec_bias) fire_off();
+        else {
+            shoot_timer.reset();
+            shoot_num++;
+        }
+        return shoot_num >= num;
     }
+
 
 }
