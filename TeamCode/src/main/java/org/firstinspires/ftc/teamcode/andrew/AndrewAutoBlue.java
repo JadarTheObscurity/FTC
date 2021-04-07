@@ -73,6 +73,7 @@ public class AndrewAutoBlue extends LinearOpMode {
         andrew.arm_half_down();
         moveTo(new WayPoint(-115, 55, Math.toRadians(-90)));
         put_down_wobble();
+
         //grab second wobble
         andrew.arm_down();
         moveTo(new WayPoint(-80, -80, Math.toRadians(0)));
@@ -136,7 +137,7 @@ public class AndrewAutoBlue extends LinearOpMode {
         //Put down yeh
         drop_intake();
         //Shoot
-        andrew.shooter_shoot_tower();
+        andrew.shooter_shoot_far();
         andrew.load_up();
         moveTo(new WayPoint(-95, -97, Math.toRadians(-7)), false);
         shoot_ring_far(3, false);
@@ -174,7 +175,6 @@ public class AndrewAutoBlue extends LinearOpMode {
         andrew.arm_half_down();
 
         //put second wobble
-//        moveTo(new WayPoint(-80, 120, Math.toRadians(0), 2));
         moveTo(new WayPoint(-120, 95, Math.toRadians(180)));
         put_down_wobble();
         andrew.arm_up();

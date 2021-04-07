@@ -257,7 +257,7 @@ public class JadarControl {
         // add extra 0.1 second to yeah you know what I mean
         boolean times_up = timer.seconds() > total_time;
         // position and time out
-        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 2 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 0.3;
+        boolean to_destine = (Pose2d.det_pose(curr, end).getlength() <= 2 && abs(Pose2d.det_pose(curr, end).getR()) < Math.toRadians(1)) || timer.seconds() > total_time + 0.4;
 
         if(times_up && to_destine){
             driveTrain.move(0, 0, 0);

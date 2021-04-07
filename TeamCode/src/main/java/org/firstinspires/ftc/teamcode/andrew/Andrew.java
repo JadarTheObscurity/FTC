@@ -53,7 +53,7 @@ public class Andrew {
     public final double shootFarVelocity = -20000;
     public final double shootTowerVelocity = -19500;
     public final double shootShotVelocity = -17000;
-    final double suckPower = 0.7;
+    final double suckPower = 0.55;
     final double reversesuckPower = -0.7;
     final double plateState_collect = 0.09;
     final double plateState_half = 0.2;
@@ -65,7 +65,7 @@ public class Andrew {
     final int arm_half_down_pos=-1500;
     final double clawState_loose = 0.5; //0.8
     final double clawState_catch = 0;//0.3
-    final double shoot_duration = 0.7;
+    final double shoot_duration = 0.55;
 
     public Andrew(HardwareMap hardwareMap) {
         setUpHardware(hardwareMap);
