@@ -56,8 +56,19 @@ public class AndrewAutoBlue extends LinearOpMode {
     }
 
     void go_home(){
-        moveTo(new WayPoint(-107, -155, Math.toRadians(0))); //Home
+//        moveTo(new WayPoint(-107, -155, Math.toRadians(0))); //Home
 //        moveTo(new WayPoint(-90, 20, Math.toRadians(0))); //White Line
+        switch (ringStatus){
+            case NONE:
+                moveTo(new WayPoint(-100, 35, Math.toRadians(-90)));
+                break;
+            case ONE:
+                moveTo(new WayPoint(-80, 30, Math.toRadians(-180)));
+                break;
+            case FOUR:
+                moveTo(new WayPoint(-120, 30, Math.toRadians(180)));
+                break;
+        }
     }
 
     void state_A(){
@@ -86,8 +97,6 @@ public class AndrewAutoBlue extends LinearOpMode {
         moveTo(new WayPoint(-110, 35, Math.toRadians(-90)));
         put_down_wobble();
         andrew.arm_up();
-
-        moveTo(new WayPoint(-90, 40, Math.toRadians(-90)));
 
         go_home();
     }
